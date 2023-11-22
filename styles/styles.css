@@ -1,4 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300&display=swap');
+/*** VARIABLES ***/
+:root {
+    --secondary-color: #f0f0f0;
+    --blue:      #3498db;
+    --dark-blue: #2980b9;
+}
 
 body {
 	padding:0;
@@ -6,20 +12,16 @@ body {
 	font-family: 'Fredoka', sans-serif;
 }
 
-
-
-:root {
-	--secondary-color:#f0f0f0;
-}
-
 a {
 	text-decoration: none;
 }
 
+/* a voir si garde (y'a plus de bouton, que des a et input[submit] */
 button {
 	margin:0;
 	padding:0;
 }
+
 
 /* header background-color:#17a2b8;
 les textes en white */
@@ -84,6 +86,7 @@ header nav ul li a {
 	padding:30px;
 }
 
+
 main {
 	padding:50px 150px;
 }
@@ -91,7 +94,8 @@ main {
 
 
 
-/* BOUTON */
+
+/*** BOUTONS ***/
 
 .btna {
 	border-radius:5px;
@@ -209,4 +213,23 @@ main {
 .rednoshadow:hover {
 	background-color:white;
 	color:#e74c3c;
+}
+
+/*** FOOTER ***/
+footer {
+    padding: 10px;
+    background-color: var(--secondary-color);
+    text-align: center;
+}
+
+#footer-links {
+    margin: 15px
+}
+
+#footer-links > a {
+    margin: 5px;
+}
+
+footer > p {
+	margin:0;
 }
