@@ -1,0 +1,147 @@
+.research .flex-research {
+	display:flex;
+	justify-content: space-between;
+	align-items: center;
+	margin:3% 20%;
+}
+
+.research .flex-research div {
+	flex:0;
+	display:flex;
+	flex-flow:column wrap;
+	text-align: center;
+	color:rgba(52, 152, 219,1.0);
+}
+
+.research .flex-research .searchinput {
+	flex:0.8;
+}
+
+.research .flex-research label {
+	font-size:10px;
+	color:;
+	margin:5px;
+}
+
+.research .flex-research input {
+	padding:8px;
+	background:rgba(52, 152, 219,0.8);
+	color:white;
+	border:1px solid rgba(52, 152, 219,1);
+	outline:none;
+	border-radius:3px;
+
+	transition:0.2s all linear;
+}
+
+.research .flex-research input:hover {
+	background:rgba(41, 128, 185,1.0)
+}
+
+.research .flex-research input:focus {
+	background-color:white;
+	color:rgba(52, 152, 219,0.8);
+}
+
+.research .flex-research select {
+	background:rgba(52, 152, 219,1.0);
+	color:white;
+	border-radius:3px;
+	border:none;
+	padding:10px;
+}
+
+.research .flex-research select:hover {
+	background:rgba(41, 128, 185,1.0);
+}
+
+.research .submit {
+	text-align:center;
+	margin-bottom:2%;
+}
+
+.research .submit input {
+	width: 4rem;
+	height: 4rem;
+	background-repeat: no-repeat;
+	background-size:55%;
+	background-position: center;
+}
+
+
+.research .submit input#confirm {
+	background-image: url("../images/search.png");
+}
+.research .submit input#confirm:hover {
+	background-image: url("../images/searchHover.png");
+}
+
+.research .submit input#reset {
+	background-image: url("../images/restart.png");
+}
+.research .submit input#reset:hover {
+	background-image: url("../images/restartHover.png");
+}
+
+
+p.nbResultat {
+	text-align: center;
+	margin:0 500px;
+	flex:1 0 100%;
+}
+
+
+
+div.liste-usagers {
+	display:flex;
+	flex-flow:row wrap;
+	justify-content:center;
+	align-items:center;
+	gap:20px;
+}
+
+div.liste-usagers > div {
+	flex:0 0 20%;
+	background:red;
+	color:white;
+	border-radius:5px;
+	cursor:crosshair;
+}
+
+div.liste-usagers > div > div {
+	padding:15px;
+	margin:0;
+}
+
+div.first-part {
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+	background-color:rgba(41, 128, 185,1.0);
+}
+
+div.second-part {
+	display:flex;
+	justify-content: space-between;
+	border-bottom-left-radius:5px;
+	border-bottom-right-radius:5px;
+	background-color:rgba(52, 152, 219,1.0);
+}
+
+/*
+p.ville, p.adresse {
+	min-height: 10vh;
+}
+*/
+
+p.name {
+	font-size:15px;
+	font-weight: bold;
+}
+
+span.label {
+	display:block;
+	font-size:10px;
+	color:#e1e1e1;
+}
+
+
