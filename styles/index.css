@@ -60,7 +60,7 @@
 	margin-bottom:2%;
 }
 
-.research .submit input {
+.research .submit input, div.liste-usagers > #createButton > a {
 	width: 4rem;
 	height: 4rem;
 	background-repeat: no-repeat;
@@ -102,10 +102,24 @@ div.liste-usagers {
 
 div.liste-usagers > div {
 	flex:0 0 20%;
-	background:red;
 	color:white;
 	border-radius:5px;
 	cursor:crosshair;
+}
+
+div.liste-usagers > #createButton {
+	text-align:center;
+	opacity:0.8;
+}
+
+div.liste-usagers > #createButton > a {
+	background-image: url("../images/plus.png");
+	font-size:9px;
+	background-position: bottom center;
+	padding:15px;
+}
+div.liste-usagers > #createButton > a:hover {
+	background-image: url("../images/plusHover.png");
 }
 
 div.liste-usagers > div > div {

@@ -23,6 +23,9 @@
 
 	<main>
 
+            <h2>Liste des patients</h2>
+
+
 		<form class="research" method="post" action="affichage.php">
 			<div class="flex-research">
 				<div class="searchinput">
@@ -54,6 +57,7 @@
 			</div>
 		</form>
 
+
 		<div class="liste-usagers">
 			<?php
 		
@@ -73,7 +77,7 @@
 				die('Erreur : ' . $e->getMessage());
 			}
 
-			$res = $linkpdo->prepare("SELECT * FROM patient".$where_requete);
+			$res = $linkpdo->prepare("SELECT * FROM patient".$where_requete."ORDER BY nom");
    			$res->execute($where_lst);
 
    			if ($res->rowcount() == 0) {
@@ -85,6 +89,14 @@
    			<p class="nbResultat"><?php echo $res->rowcount() ?> résultat(s)</p>
    			<?php
    		}
+
+   			?>
+   			<div id="createButton">
+				<a href="ajout.php" class="btna blue">
+					Ajouter un patient
+				</a>
+			</div>
+			<?php
 
    			while ($data = $res->fetch()) {
 
@@ -108,8 +120,12 @@
 		}
 		} else {
 			?>
-			<p class="nbResultat">Voici un aperçu des 12 premiers patients du cabinet médical</p>
-
+			<p class="nbResultat">Voici un aperçu des 11 premiers patients (ordre alphabétique) du cabinet médical</p>
+			<div id="createButton">
+				<a href="ajout.php" class="btna blue">
+					Ajouter un patient
+				</a>
+			</div>
 			<?php
 			try {
 				$linkpdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
@@ -117,13 +133,13 @@
 			catch (Exception $e) {
 				die('Erreur : ' . $e->getMessage());
 			}
-			$res = $linkpdo->prepare("SELECT * FROM patient");
+			$res = $linkpdo->prepare("SELECT * FROM patient ORDER BY nom");
 			$res->execute();
 
-			$max12 = 0;
+			$max11 = 0;
 
-			while ($data = $res->fetch() and $max12 < 12) {
-				$max12++;
+			while ($data = $res->fetch() and $max11 < 11) {
+				$max11++;
 		?>
 
 			<div>
