@@ -11,12 +11,12 @@
 <body>
 
 	<header id="header">
-		<h3 id="header-title">Cabinet médical de Mac-Sens</h3>
+		<h3 id="header-title">Cabinet médical de Mac-Sens et Haine-Zoo</h3>
 
 		<nav>
 			<ul>
 				<li id="currentPage"><a href="#">Patient</a></li>
-				<li><a href="ajout.php">Médecin</a></li>
+				<li><a href="affichageMedecin.php">Médecin</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -30,7 +30,32 @@
 			<div class="flex-research">
 				<div class="searchinput">
 					<label for="searchinput">Recherche avancé</label>
-					<input name="searchinput" required id="searchinput" value="<?php echo (isset($_POST['rechercher'])) ? $_POST['searchinput'] : '' ?>" placeholder="Recherchez un patient ici">
+					<input name="searchinput" required id="searchinput" value="<?php echo (isset($_POST['rechercher'])) ? $_POST['searchinput'] : '' ?>" placeholder="Recherchez un patient ici (Optionnel)">
+				</div>
+
+				<div class="medecinTraitant">
+					<label for="medecinTraitant">Filtre médecin</label>
+					<select name="medecinTraitant" id="medecinTraitant">
+						<option>Indifférent</option>
+						<?php
+							try {
+				      			$linkpdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
+							} catch (Exception $e) {
+								die('Erreur : ' . $e->getMessage());
+							}
+							$resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM medecin ORDER BY nom");
+							$resMedecinString->execute();
+
+   							while ($data = $resMedecinString->fetch()) {
+   								$string = $data[0]." ".$data[1]." (".$data[2].")";
+						?>
+
+						<option <?php echo (isset($_POST['rechercher'])) ? ($_POST['medecinTraitant'] == $string ? 'selected' : '') : '' ?>><?php echo $string ?></option>
+
+						<?php
+						}
+						?>
+					</select>
 				</div>
 
 				<div class="toulouse">
@@ -76,9 +101,10 @@
 			} catch (Exception $e) {
 				die('Erreur : ' . $e->getMessage());
 			}
-
-			$res = $linkpdo->prepare("SELECT * FROM patient".$where_requete."ORDER BY nom");
+			$res = $linkpdo->prepare("SELECT * FROM patient".$where_requete." ORDER BY nom");
    			$res->execute($where_lst);
+
+
 
    			if ($res->rowcount() == 0) {
    			?>
@@ -99,6 +125,19 @@
 			<?php
 
    			while ($data = $res->fetch()) {
+   				if ($data['idMedecin'] != null) {
+	   				$resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM medecin WHERE idMedecin = :idMedecin");
+   					$resMedecinString->execute(array('idMedecin' => $data['idMedecin']));
+   					$result = $resMedecinString->fetch();
+   					$medecinString = $result[2]." ".$result[0]." ".$result[1];
+   					// pour un foreach affiche en double la liste : il y a 6 execution alors que $result[3] renvoit une erreur
+   					// echo "test";
+   					//foreach($result as $d) {
+   					//	echo $d."DD";
+   					//}
+   				} else {
+   					$medecinString = "Aucun";
+   				}
 
    			?>
 
@@ -109,6 +148,7 @@
 					<p class="ville"><span class="label">Ville</span><?php echo $data['ville'] ?></p>
 					<p><span class="label">Code postal</span><?php echo $data['codePostal'] ?></p>
 					<p><span class="label">Numéro de sécu</span><?php echo $data['numSecu'] ?></p>
+					<p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="#" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
 				</div>
 				<div class="second-part">
 					<button class="btna bluenoshadow">Modifier</button>
@@ -120,7 +160,7 @@
 		}
 		} else {
 			?>
-			<p class="nbResultat">Voici un aperçu des 11 premiers patients (ordre alphabétique) du cabinet médical</p>
+			<p class="nbResultat">Voici un aperçu des 11 premiers patients du cabinet médical</p>
 			<div id="createButton">
 				<a href="ajout.php" class="btna blue">
 					Ajouter un patient
@@ -140,6 +180,14 @@
 
 			while ($data = $res->fetch() and $max11 < 11) {
 				$max11++;
+				if ($data['idMedecin'] != null) {
+	   				$resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM medecin WHERE idMedecin = :idMedecin");
+   					$resMedecinString->execute(array('idMedecin' => $data['idMedecin']));
+   					$result = $resMedecinString->fetch();
+   					$medecinString = $result[2]." ".$result[0]." ".$result[1];
+   				} else {
+   					$medecinString = "Aucun";
+   				}
 		?>
 
 			<div>
@@ -149,6 +197,7 @@
 					<p class="ville"><span class="label">Ville</span><?php echo $data['ville'] ?></p>
 					<p><span class="label">Code postal</span><?php echo $data['codePostal'] ?></p>
 					<p><span class="label">Numéro de sécu</span><?php echo $data['numSecu'] ?></p>
+					<p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="#" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
 				</div>
 				<div class="second-part">
 					<button class="btna bluenoshadow">Modifier</button>
@@ -160,8 +209,6 @@
 			?>
 		</div>
 	</main>
-
-<script type="text/javascript" src="js/index.js"></script>
 
 
 </body>
