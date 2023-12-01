@@ -26,7 +26,7 @@
             <h2>Liste des patients</h2>
 
 
-		<form class="research" method="post" action="affichage.php">
+		<form class="research" id="formResearch" method="post" action="affichage.php">
 			<div class="flex-research">
 				<div class="searchinput">
 					<label for="searchinput">Recherche avancé</label>
@@ -209,6 +209,8 @@
 			?>
 		</div>
 	</main>
+
+	<script src="js/affichage.js"></script>
 
 
 </body>
