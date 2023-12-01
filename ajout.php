@@ -17,11 +17,23 @@
     </head>
 
     <body>
+        <header id="header">
+            <h3 id = "header-title">Cabinet médical de Mac-Sens et Haine-Zoo</h3>
+
+            <nav>
+                <ul>
+                    <li id="currentPage"><a href="#">Patient</a></li>
+                    <li><a href="affichageMedecin.php">Médecin</a></li>
+                </ul>
+            </nav>
+        </header>
+
         <main>
             <?php
                 if(empty($_POST["nom"])) {
                     $nom  = "";
                 } else {
+
                     // Valeurs du formulaire
                     $nom        = $_POST["nom"];
                     $prenom     = $_POST["prenom"];
@@ -57,38 +69,42 @@
                 }
             ?>
 
+            <div id = "tabs">
+                <button class = "tablinks" onclick = "openTab(event, 'Patient')" id = "current">Patient</button>
+                <button class = "tablinks" onclick = "openTab(event, 'Medecin')">Medecin</button>
+            </div>
             <h2>Ajouter un patient</h2>
 
             <!-- Formulaire principal d'ajout d'un patient -->
             <form method = "post" action = "ajout.php">
-                <div class = "mainForm">
+                <div id = "Patient" class = "mainForm">
                     <div class = "formColumn">
                         <div class = "formInput">
                             <div class = "formLabel">Civilité:</div>
-                            <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civilite" id = "monsieur" value = "">
-                            <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civilite" id = "madame"   value = ""> <br>
+                            <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civilite" id = "monsieur" value = "" required>
+                            <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civilite" id = "madame"   value = "" required> <br>
                         </div>
 
                         <div class = "formInput">
                             <div class = "formLabel"><label for = "nom">Nom:</label></div>
-                            <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "" required> <br>
+                            <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
                         </div>
 
                         <div class = "formInput">
                             <div class = "formLabel"><label for = "prenom" >Prénom:</label></div>
-                            <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = ""> <br>
+                            <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
                         </div> 
 
                         <div class = "formInput">
                             <div class = "formLabel"><label for = "numSecu">Numéro de Sécurité Sociale:</label></div>
-                            <input type = "text" name = "numSecu" id = "numSecu" class = "shortInput" value = "">
+                            <input type = "text" name = "numSecu" id = "numSecu" class = "shortInput" value = "" required>
                         </div>
                     </div>
 
                     <div class = "formColumn">
                         <div class = "formInput">
                             <div class = "formLabel"><label for = "adresse1">Adresse:</label></div>
-                            <input type = "text" name = "adresse1" id = "adresse1" class = "longInput" value = ""> <br>
+                            <input type = "text" name = "adresse1" id = "adresse1" class = "longInput" value = "" required> <br>
                         </div>
 
                         <div class = "formInput">
@@ -99,20 +115,36 @@
                         <div class = "formDoubleInput">
                             <div class = "formInput">
                                 <div class = "formLabel"><label for = "ville">Ville:</label></div>
-                                <input type = "text" name = "ville" id = "ville" class = "shortInput" value = "">
+                                <input type = "text" name = "ville" id = "ville" class = "shortInput" value = "" required>
                             </div>
 
                             <div class = "formInput">
                                 <div class = "formLabel formSecondLabel"><label for = "codePostal">Code postal:</label></div>
-                                <input type = "text" name = "codePostal" id = "codePostal" value = "">
+                                <input type = "text" name = "codePostal" id = "codePostal" value = "" pattern = "\d{5,5}" required>
                             </div>
                         </div>
 
                         <div class = "formInput">
                             <div class = "formLabel"><label for = "medecin">Médecin traitant:</label></div>
-                            <input type = "text" name = "medecin" id = "medecin" class = "longInput" value = ""> <br>
+                            <input type = "text" name = "medecin" id = "medecin" class = "longInput" value = "" required> <br>
                         </div>
                     </div>         
+                </div>
+
+                <div id = "Medecin" class = "mainForm">
+                    <div class = "formInput">
+                        <div class = "formLabel">Civilité:</div>
+                        <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civilite" id = "monsieur" value = "" required>
+                        <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civilite" id = "madame"   value = "" required> <br>
+                    </div>
+                    <div class = "formInput">
+                        <div class = "formLabel"><label for = "nom">Nom:</label></div>
+                        <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
+                    </div>
+                    <div class = "formInput">
+                        <div class = "formLabel"><label for = "prenom" >Prénom:</label></div>
+                        <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
+                    </div>    
                 </div>
 
                 <div class = "formButtons">
@@ -130,7 +162,7 @@
                 <a href = "suppréssion.php"> Supprimer</a>
             </div> 
             
-            <p>© LOUIS Enzo & MAURY-BALIT Maxence</p>
+            <p>🄯 LOUIS Enzo & MAURY-BALIT Maxence</p>
         </footer> 
     </body>
 </html>
