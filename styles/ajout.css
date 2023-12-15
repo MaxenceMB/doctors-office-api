@@ -4,17 +4,19 @@
 
     --blue:           #3498db;
     --dark-blue:      #2980b9;
-    --very-dark-blue: #2677ad;
+    --very-dark-blue: #1f608b;
 }
 
 /*** TITRES ***/
 h2 {
     width:   1005px;
-    margin:  10px auto;
+    margin:  0 auto;
     padding: 10px;
 
     background-color: var(--dark-blue);
-    border-radius: 10px;
+    border-top-left-radius:     10px;
+    border-top-right-radius:    10px;
+    border-bottom: 3px solid var(--blue);
 
     color: white;
 }
@@ -24,7 +26,8 @@ h2 {
 /* tabs */
 #tabs {
     width:   1005px;
-    margin:  -10px auto;
+    height:  60px;
+    margin:  0 auto;
     padding: 0 10px;
     
     display: flex;
@@ -33,7 +36,7 @@ h2 {
 /* tabs boutons */
 #tabs button {
     padding: 5px 20px;
-    margin-top: 15px;
+    margin-top: 25px;
 
     background-color: var(--very-dark-blue);
     border: none;
@@ -42,10 +45,12 @@ h2 {
 
     color: white;
     font-size: 18px;
+
+    transition: 0.15s;
 }
 
 #tabs button:hover { 
-    margin-top: 0;
+    margin-top: 10px;
 }
 
 #tabs #current {
@@ -59,7 +64,9 @@ form {
     color: var(--secondary-color);
 
     background-color: var(--dark-blue);
-    border-radius: 10px;
+    border-bottom-left-radius:  10px;
+    border-bottom-right-radius: 10px;
+    border-top: 3px solid var(--blue);
 }
 
 
@@ -67,18 +74,22 @@ form {
 .mainForm {
     display: flex;
     justify-content: center;
+    padding: 15px 0;
 }
 
 
 /* La zone finale du formulaire avec les deux boutons */
 .formButtons {
-    margin-top: 15px;
-    padding: 10px;
     display: flex;
+    padding: 15px;
 
     background-color: var(--blue);
     border-bottom-left-radius:  10px;
     border-bottom-right-radius: 10px;
+}
+
+.formButtons .ma {
+    margin: 0 5px;
 }
 
 
@@ -93,7 +104,7 @@ form {
 
 /* PATIENTS */
 /* Chaque input avec son label */
-#Patient .formInput {
+.Patient .formInput {
     display: flex;
     align-items: center;
 
@@ -102,14 +113,14 @@ form {
 
 
 /* La zone à deux inputs */
-#Patient .formDoubleInput {
+.Patient .formDoubleInput {
     display: flex;
     justify-content: space-between;
 }
 
 
 /* Les labels des inputs */
-#Patient .formLabel {
+.Patient .formLabel {
     width:  175px;
     font-size: 18px;
     font-weight: bold;
@@ -120,14 +131,14 @@ form {
 }
 
 /* Le deuxième label des zone à deux inputs */
-#Patient .formSecondLabel {
+.Patient .formSecondLabel {
     width: auto;
     margin-right: 15px;
 }
 
 
 /* Tous les inputs textuels */
-#Patient input[type = text] {
+.Patient input[type = text] {
     border:           none;
     border-bottom:    2px solid darkblue;
     border-radius:    3px;
@@ -137,12 +148,12 @@ form {
 }
 
 /* Les inputs "court" */
-#Patient .shortInput {
+.Patient .shortInput {
     width: 15em;
 }
 
 /* Les inputs "long" */
-#Patient .longInput {
+.Patient .longInput {
     width: 30em;
 }
 
@@ -151,19 +162,20 @@ form {
     width: 4em;
 }
 
+
 /* MEDECINS */
-#Medecin {
+.Medecin {
     display: none;
 }
 
 
 /* Les inputs de medecins */
-#Medecin .formInput {
+.Medecin .formInput {
     width: 250px;
 }
 
 /* inputs textuels */
-#Medecin input[type = text] {
+.Medecin input[type = text] {
     border:           none;
     border-bottom:    2px solid darkblue;
     border-radius:    3px;
@@ -173,7 +185,7 @@ form {
 }
 
 /* Les labels des inputs */
-#Medecin .formLabel {
+.Medecin .formLabel {
     font-size: 18px;
     font-weight: bold;
 
@@ -184,6 +196,6 @@ form {
 
 
 /* Les inputs "court" */
-#Medecin .shortInput {
+.Medecin .shortInput {
     width: 15em;
 }

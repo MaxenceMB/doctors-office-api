@@ -30,54 +30,61 @@
 
         <main>
             <?php
-                if(empty($_POST["nom"])) {
-                    $nom  = "";
-                } else {
 
-                    // Valeurs du formulaire
-                    $nom        = $_POST["nom"];
-                    $prenom     = $_POST["prenom"];
-                    $civilite   = $_POST["civilite"];
-                    $adresse1   = $_POST["adresse1"];
-                    $adresse2   = $_POST["adresse2"];            
-                    $ville      = $_POST["ville"];
-                    $codePostal = $_POST["codePostal"];
-                    $numSecu    = $_POST["numSecu"];
-        
-                    // Vérification si le patient existe déjà
-                    $req = $link->prepare('SELECT nom, prenom, ville
-                                        FROM   patient
-                                        WHERE  LOWER(numSecu) = LOWER(:numSecu);');
-        
-                    $req->execute(array(':numSecu' => $numSecu));
-                    if($req->rowCount() > 0) {
-                        die("Le patient existe déjà dans la base de données.");
+                if (empty($_POST["nom"])) {
+                    $nom = "";
+                } else {
+                    if(isset($POST["validerPatient"])) {
+
+                        // Valeurs du formulaire
+                        $nom        = $_POST["nom"];
+                        $prenom     = $_POST["prenom"];
+                        $civilite   = $_POST["civilite"];
+                        $adresse1   = $_POST["adresse1"];
+                        $adresse2   = $_POST["adresse2"];
+                        $ville      = $_POST["ville"];
+                        $codePostal = $_POST["codePostal"];
+                        $numSecu    = $_POST["numSecu"];
+
+                        // Vérification si le patient existe déjà
+                        $req = $link->prepare('SELECT nom, prenom, ville
+                                            FROM   patient
+                                            WHERE  LOWER(numSecu) = LOWER(:numSecu);');
+
+                        $req->execute(array(':numSecu' => $numSecu));
+                        if ($req->rowCount() > 0) {
+                            die("Le patient existe déjà dans la base de données.");
+                        }
+
+                        // Préparation
+                        $req = $link->prepare('INSERT INTO patient(nom, prenom, civilite, adresse1, adresse2, ville, codePostal, numSecu)
+                                            VALUES(:nom, :prenom, :civilite, :adresse1, :adresse2, :ville, :codePostal, :numSecu)');
+
+                        $req->execute(array('nom' => $nom,
+                            'prenom' => $prenom,
+                            'civilite' => $civilite,
+                            'adresse1' => $adresse1,
+                            'adresse2' => $adresse2,
+                            'ville' => $ville,
+                            'codePostal' => $codePostal,
+                            'numSecu' => $numSecu));
+
+                    } else if(isset($POST["validerMedecin"])) {
+                        
                     }
-        
-                    // Préparation
-                    $req = $link->prepare('INSERT INTO patient(nom, prenom, civilite, adresse1, adresse2, ville, codePostal, numSecu)
-                                        VALUES(:nom, :prenom, :civilite, :adresse1, :adresse2, :ville, :codePostal, :numSecu)');
-        
-                    $req->execute(array('nom'        => $nom,
-                                        'prenom'     => $prenom,
-                                        'civilite'   => $civilite,
-                                        'adresse1'   => $adresse1,
-                                        'adresse2'   => $adresse2,
-                                        'ville'      => $ville,
-                                        'codePostal' => $codePostal,
-                                        'numSecu'    => $numSecu));
                 }
             ?>
 
             <div id = "tabs">
-                <button class = "tablinks" onclick = "openTab(event, 'Patient')" id = "current">Patient</button>
-                <button class = "tablinks" onclick = "openTab(event, 'Medecin')">Medecin</button>
+                <button class = "tablinks" onclick = "showTab('Patient')" id = "current">Patient</button>
+                <button class = "tablinks" onclick = "showTab('Medecin')">Medecin</button>
             </div>
-            <h2>Ajouter un patient</h2>
+            <h2 class = "Patient">Ajouter un patient</h2>
+            <h2 class = "Medecin">Ajouter un medecin</h2>
 
             <!-- Formulaire principal d'ajout d'un patient -->
-            <form method = "post" action = "ajout.php">
-                <div id = "Patient" class = "mainForm">
+            <form method = "post" action = "ajout.php" class = "Patient" id = "formPatient">
+                <div class = "mainForm" class = "Patient">
                     <div class = "formColumn">
                         <div class = "formInput">
                             <div class = "formLabel">Civilité:</div>
@@ -87,12 +94,12 @@
 
                         <div class = "formInput">
                             <div class = "formLabel"><label for = "nom">Nom:</label></div>
-                            <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
+                            <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "" pattern = "\w{1,20}" required> <br>
                         </div>
 
                         <div class = "formInput">
                             <div class = "formLabel"><label for = "prenom" >Prénom:</label></div>
-                            <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
+                            <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = "" pattern = "\w{1,20}" required> <br>
                         </div> 
 
                         <div class = "formInput">
@@ -128,10 +135,18 @@
                             <div class = "formLabel"><label for = "medecin">Médecin traitant:</label></div>
                             <input type = "text" name = "medecin" id = "medecin" class = "longInput" value = "" required> <br>
                         </div>
-                    </div>         
+                    </div> 
                 </div>
+                    
+                <div class = "formButtons">
+                    <div class="ma"><input type = "reset"   name = "reset"          class="btna red"></div>
+                    <div class="ma"><input type = "submit"  name = "validerPatient" class="btna green"></div>
+                </div>      
+            </form>
 
-                <div id = "Medecin" class = "mainForm">
+            <!-- Formulaire principal d'ajout d'un Medecin -->
+            <form method = "post" action = "ajout.php" class = "Medecin" id = "formMedecin">
+                <div class = "mainForm" class = "Medecin">
                     <div class = "formInput">
                         <div class = "formLabel">Civilité:</div>
                         <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civilite" id = "monsieur" value = "" required>
@@ -139,17 +154,17 @@
                     </div>
                     <div class = "formInput">
                         <div class = "formLabel"><label for = "nom">Nom:</label></div>
-                        <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
+                        <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "" pattern = "\w{1,20}" required> <br>
                     </div>
                     <div class = "formInput">
                         <div class = "formLabel"><label for = "prenom" >Prénom:</label></div>
-                        <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = "" pattern = "\w{1, 20}" required> <br>
+                        <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = "" pattern = "\w{1,20}" required> <br>
                     </div>    
                 </div>
-
+                
                 <div class = "formButtons">
-                    <div class="ma"><input type = "reset"   name = "reset"   class="btna red"></div>
-                    <div class="ma"><input type = "submit"  name = "valider" class="btna green"></div>
+                    <div class="ma"><input type = "reset"   name = "reset"          class="btna red"></div>
+                    <div class="ma"><input type = "submit"  name = "validerMedecin" class="btna green"></div>
                 </div>
             </form>
         </main>
@@ -164,5 +179,7 @@
             
             <p>🄯 LOUIS Enzo & MAURY-BALIT Maxence</p>
         </footer> 
+
+        <script src = "js/ajout.js"></script>
     </body>
 </html>
