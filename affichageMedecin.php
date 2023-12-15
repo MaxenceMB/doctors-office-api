@@ -16,7 +16,7 @@
 		<nav>
 			<ul>
 				<li><a href="affichage.php">Patient</a></li>
-				<li id="currentPage"><a href="ajout.php">Médecin</a></li>
+				<li id="currentPage"><a href="#">Médecin</a></li>
 			</ul>
 		</nav>
 	</header>
@@ -25,19 +25,11 @@
 
 		<h2>Liste des médecins</h2>
 
-		<form class="research" method="post" action="affichageMedecin.php">
+		<form class="research" onsubmit="return checkValidMedecin()" method="post" action="affichageMedecin.php">
 			<div class="flex-research">
 				<div class="searchinput">
 					<label for="searchinput">Recherche avancé</label>
-					<input name="searchinput" required id="searchinput" value="<?php echo (isset($_POST['rechercher'])) ? $_POST['searchinput'] : '' ?>" placeholder="Recherchez un patient ici">
-				</div>
-
-				<div class="toulouse">
-					<label for="toulouse">Filtre Toulouse</label>
-					<select name="toulouse" id="toulouse">
-						<option value="">Indifférent</option>
-						<option value="toulouse" <?php echo (isset($_POST['rechercher'])) ? ($_POST['toulouse'] == 'toulouse' ? 'selected' : '') : '' ?>>Toulouse</option>
-					</select>
+					<input name="searchinput" id="searchinput" value="<?php echo (isset($_POST['rechercher'])) ? $_POST['searchinput'] : '' ?>" placeholder="Recherchez un médecin ici  (Optionnel)">
 				</div>
 
 				<div class="civilite">
@@ -59,15 +51,54 @@
 
 		<div class="liste-usagers">
 			<?php
+
+		if (isset($_GET['id'])) {
+			try {
+      			$linkpdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
+			} catch (Exception $e) {
+				die('Erreur : ' . $e->getMessage());
+			}
+
+			$res = $linkpdo->prepare("SELECT * FROM medecin WHERE idMedecin = :idMedecin");
+   			$res->execute(array('idMedecin' => $_GET['id']));
+
+			$data = $res->fetch();
+			$resCountPatientAssocie = $linkpdo->prepare("SELECT count(*) FROM patient WHERE idMedecin = :idMedecin");
+			$resCountPatientAssocie->execute(array('idMedecin' => $_GET['id']));
+			$countPatient = $resCountPatientAssocie->fetch()[0];
+   		?>
+
+   		<div>
+			<div class="first-part">
+				<p class="name"><?php echo $data['civilite']." ".$data['nom']." ".$data['prenom'] ?></p>
+				<p class="countPatient"><span class="label">Patients attitrés</span><?php echo $countPatient ?><?php if ($countPatient != 0) {?> <span class="detail">(</span><a href="affichage.php?idMedecin=<?php echo $data['idMedecin']?>" class="detail">voir la liste</a><span class="detail">)</span><?php }?></p>
+			</div>
+			<div class="second-part">
+				<button class="btna bluenoshadow">Modifier</button>
+				<button class="btna rednoshadow">Supprimer</button>
+			</div>
+		</div>
+
+
+		<?php
+	}
+
 		
-		if (isset($_POST['rechercher'])) {
+		else if (isset($_POST['rechercher'])) {
 			$recherche = explode(" ", $_POST['searchinput']);
 
 			$where_requete = "";
 			$where_lst = array();
 			foreach ($recherche as $key => $value) {
-				$where_requete .= (($key == 0) ? " WHERE" : " OR")." nom LIKE :keyword$key OR prenom LIKE :keyword$key OR civilite LIKE :keyword$key";
+				$where_requete .= (($key == 0) ? " WHERE (" : " OR")." nom LIKE :keyword$key OR prenom LIKE :keyword$key OR civilite LIKE :keyword$key";
 				$where_lst["keyword$key"] = "%$value%";
+			}
+
+			$where_requete .= ")";
+
+			if ($_POST["civilite"] != "Indifférent") {
+				$where_requete .= " AND civilite = :civilite";
+				$where_lst["civilite"] = $_POST['civilite'];
 			}
 
 			try {
@@ -107,7 +138,7 @@
 			<div>
 				<div class="first-part">
 					<p class="name"><?php echo $data['civilite']." ".$data['nom']." ".$data['prenom'] ?></p>
-					<p class="countPatient"><span class="label">Patients attritrés</span><?php echo $countPatient ?> <span class="detail">(</span><a href="#" class="detail">voir la liste</a><span class="detail">)</span></p>
+					<p class="countPatient"><span class="label">Patients attitrés</span><?php echo $countPatient ?><?php if ($countPatient != 0) {?> <span class="detail">(</span><a href="affichage.php?idMedecin=<?php echo $data['idMedecin']?>" class="detail">voir la liste</a><span class="detail">)</span><?php }?></p>
 				</div>
 				<div class="second-part">
 					<button class="btna bluenoshadow">Modifier</button>
@@ -148,7 +179,7 @@
 			<div>
 				<div class="first-part">
 					<p class="name"><?php echo $data['civilite']." ".$data['nom']." ".$data['prenom'] ?></p>
-					<p class="countPatient"><span class="label">Patients attritrés</span><?php echo $countPatient ?> <span class="detail">(</span><a href="#" class="detail">voir la liste</a><span class="detail">)</span></p>
+					<p class="countPatient"><span class="label">Patients attitrés</span><?php echo $countPatient ?><?php if ($countPatient != 0) {?> <span class="detail">(</span><a href="affichage.php?idMedecin=<?php echo $data['idMedecin']?>" class="detail">voir la liste</a><span class="detail">)</span><?php }?></p>
 				</div>
 				<div class="second-part">
 					<button class="btna bluenoshadow">Modifier</button>
@@ -161,6 +192,7 @@
 		</div>
 	</main>
 
+	<script src="js/affichage.js"></script>
 
 </body>
 </html>
