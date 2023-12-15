@@ -26,11 +26,11 @@
             <h2>Liste des patients</h2>
 
 
-		<form class="research" id="formResearch" method="post" action="affichage.php">
+		<form class="research" onsubmit="return checkValidPatient(event, this)" method="post" action="affichage.php">
 			<div class="flex-research">
 				<div class="searchinput">
 					<label for="searchinput">Recherche avancé</label>
-					<input name="searchinput" required id="searchinput" value="<?php echo (isset($_POST['rechercher'])) ? $_POST['searchinput'] : '' ?>" placeholder="Recherchez un patient ici (Optionnel)">
+					<input onclick="false" name="searchinput" id="searchinput" value="<?php echo (isset($_POST['rechercher'])) ? $_POST['searchinput'] : '' ?>" placeholder="Recherchez un patient ici (Optionnel)">
 				</div>
 
 				<div class="medecinTraitant">
@@ -43,14 +43,16 @@
 							} catch (Exception $e) {
 								die('Erreur : ' . $e->getMessage());
 							}
-							$resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM medecin ORDER BY nom");
+							$resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite, idMedecin FROM medecin ORDER BY nom");
 							$resMedecinString->execute();
 
    							while ($data = $resMedecinString->fetch()) {
    								$string = $data[0]." ".$data[1]." (".$data[2].")";
+   								$idMedecinT = $data[3];
 						?>
 
-						<option <?php echo (isset($_POST['rechercher'])) ? ($_POST['medecinTraitant'] == $string ? 'selected' : '') : '' ?>><?php echo $string ?></option>
+
+						<option value="<?php echo $idMedecinT?>" <?php echo (isset($_POST['rechercher'])) ? ($_POST['medecinTraitant'] == $idMedecinT ? 'selected' : '') : '' ?>><?php echo $string; ?></option>
 
 						<?php
 						}
@@ -61,7 +63,7 @@
 				<div class="toulouse">
 					<label for="toulouse">Filtre Toulouse</label>
 					<select name="toulouse" id="toulouse">
-						<option value="">Indifférent</option>
+						<option>Indifférent</option>
 						<option value="toulouse" <?php echo (isset($_POST['rechercher'])) ? ($_POST['toulouse'] == 'toulouse' ? 'selected' : '') : '' ?>>Toulouse</option>
 					</select>
 				</div>
@@ -84,17 +86,80 @@
 
 
 		<div class="liste-usagers">
-			<?php
 		
-		if (isset($_POST['rechercher'])) {
+		<?php
+
+		if (isset($_GET['idMedecin'])) {
+			try {
+      			$linkpdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
+			} catch (Exception $e) {
+				die('Erreur : ' . $e->getMessage());
+			}
+
+			$res = $linkpdo->prepare("SELECT * FROM patient WHERE idMedecin = :idMedecin");
+   			$res->execute(array('idMedecin' => $_GET['idMedecin']));
+
+   			if ($res->rowcount() == 0) {
+	   			?>
+	   		<p class="nbResultat">Aucun résultat</p>
+	   			<?php
+	   		} else {
+	   			?>
+	   		<p class="nbResultat"><?php echo $res->rowcount() ?> résultat(s)</p>
+	   			<?php
+	   		}
+	   			
+
+			while ($data = $res->fetch()) {
+				$resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM medecin WHERE idMedecin = :idMedecin");
+				$resMedecinString->execute(array('idMedecin' => $data['idMedecin']));
+				$result = $resMedecinString->fetch();
+				$medecinString = $result[2]." ".$result[0]." ".$result[1];
+   		?>
+
+   		<div>
+			<div class="first-part">
+				<p class="name"><?php echo $data['civilite']." ".$data['nom']." ".$data['prenom'] ?></p>
+				<p class="adresse"><span class="label">Adresse</span><?php echo $data['adresse1'] ?>;<br><?php echo $data['adresse2'] ?></p>
+				<p class="ville"><span class="label">Ville</span><?php echo $data['ville'] ?></p>
+				<p><span class="label">Code postal</span><?php echo $data['codePostal'] ?></p>
+				<p><span class="label">Numéro de sécu</span><?php echo $data['numSecu'] ?></p>
+				<p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="affichageMedecin.php?id=<?php echo $data['idMedecin']?>" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
+			</div>
+			<div class="second-part">
+				<button class="btna bluenoshadow">Modifier</button>
+				<button class="btna rednoshadow">Supprimer</button>
+			</div>
+		</div>
+
+
+   		<?php }}
+		else if (isset($_POST['rechercher'])) {
 			$recherche = explode(" ", $_POST['searchinput']);
 
 			$where_requete = "";
 			$where_lst = array();
 			foreach ($recherche as $key => $value) {
-				$where_requete .= (($key == 0) ? " WHERE" : " OR")." nom LIKE :keyword$key OR prenom LIKE :keyword$key OR civilite LIKE :keyword$key OR adresse1 LIKE :keyword$key OR adresse2 LIKE :keyword$key OR ville LIKE :keyword$key OR codePostal LIKE :keyword$key OR numSecu LIKE :keyword$key";
+				$where_requete .= (($key == 0) ? " WHERE (" : " OR")." nom LIKE :keyword$key OR prenom LIKE :keyword$key OR civilite LIKE :keyword$key OR adresse1 LIKE :keyword$key OR adresse2 LIKE :keyword$key OR ville LIKE :keyword$key OR codePostal LIKE :keyword$key OR numSecu LIKE :keyword$key";
 				$where_lst["keyword$key"] = "%$value%";
 			}
+			$where_requete .= ")";
+
+			if ($_POST["medecinTraitant"] != "Indifférent") {
+				$where_requete .= " AND idMedecin = :idMedecin";
+				$where_lst["idMedecin"] = $_POST['medecinTraitant'];
+			}
+
+			if ($_POST["toulouse"] != "Indifférent") {
+				$where_requete .= " AND lower(ville) = 'toulouse'";
+			}
+
+			if ($_POST["civilite"] != "Indifférent") {
+				$where_requete .= " AND civilite = :civilite";
+				$where_lst["civilite"] = $_POST['civilite'];
+			}
+
+			
 
 			try {
       			$linkpdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
@@ -103,8 +168,6 @@
 			}
 			$res = $linkpdo->prepare("SELECT * FROM patient".$where_requete." ORDER BY nom");
    			$res->execute($where_lst);
-
-
 
    			if ($res->rowcount() == 0) {
    			?>
@@ -148,7 +211,7 @@
 					<p class="ville"><span class="label">Ville</span><?php echo $data['ville'] ?></p>
 					<p><span class="label">Code postal</span><?php echo $data['codePostal'] ?></p>
 					<p><span class="label">Numéro de sécu</span><?php echo $data['numSecu'] ?></p>
-					<p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="#" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
+					<p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="affichageMedecin.php?id=<?php echo $data['idMedecin']?>" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
 				</div>
 				<div class="second-part">
 					<button class="btna bluenoshadow">Modifier</button>
@@ -197,7 +260,7 @@
 					<p class="ville"><span class="label">Ville</span><?php echo $data['ville'] ?></p>
 					<p><span class="label">Code postal</span><?php echo $data['codePostal'] ?></p>
 					<p><span class="label">Numéro de sécu</span><?php echo $data['numSecu'] ?></p>
-					<p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="#" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
+					<p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="affichageMedecin.php?id=<?php echo $data['idMedecin']?>" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
 				</div>
 				<div class="second-part">
 					<button class="btna bluenoshadow">Modifier</button>
