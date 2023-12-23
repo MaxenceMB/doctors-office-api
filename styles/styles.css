@@ -4,6 +4,8 @@
     --secondary-color: #f0f0f0;
     --blue:      #3498db;
     --dark-blue: #2980b9;
+    --very-dark-blue: #1f608b;
+    --link-color: #468ed6;
 }
 
 body {
@@ -13,6 +15,7 @@ body {
 }
 
 a {
+	color: var(--link-color);
 	text-decoration: none;
 }
 
@@ -219,17 +222,85 @@ main {
 footer {
     padding: 10px;
     background-color: var(--secondary-color);
-    text-align: center;
 }
 
 #footer-links {
-    margin: 15px
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 #footer-links > a {
-    margin: 5px;
+	display: flex;
+	flex-direction: column;
+    align-items: center;
+    margin: 5px 20px;
+}
+
+#footer-links > a > p {
+	margin: 0;
+}
+
+#footer-links > a > img {
+	border: 1px solid var(--link-color);
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
 }
 
 footer > p {
+	text-align: center;
 	margin:0;
+}
+
+
+
+
+/* Système de tab */
+
+/*** TITRES ***/
+h2 {
+    margin:  0 auto;
+    padding: 10px;
+
+    background-color: var(--dark-blue);
+    border-top-left-radius:     10px;
+    border-top-right-radius:    10px;
+    border-bottom: 0px solid var(--blue);
+
+    color: white;
+}
+
+/*** MAIN FORM ***/
+/* tabs */
+#tabs {
+    height:  60px;
+    margin:  0 auto;
+    padding: 0 10px;
+    
+    display: flex;
+}
+
+/* tabs boutons */
+#tabs button {
+    padding: 5px 20px;
+    margin-top: 25px;
+
+    background-color: var(--very-dark-blue);
+    border: none;
+    border-top-left-radius:  10px;
+    border-top-right-radius: 10px;
+
+    color: white;
+    font-size: 18px;
+
+    transition: 0.15s;
+}
+
+#tabs button:hover { 
+    margin-top: 10px;
+}
+
+#tabs #current {
+    background-color: var(--dark-blue);
 }

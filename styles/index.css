@@ -113,6 +113,23 @@
 }
 
 
+
+/* Complétion du système de Tabs */
+div#formPatient, div#formMedecin {
+    border-bottom-left-radius:  5px;
+    border-bottom-right-radius: 5px;
+    border-bottom:3px solid var(--dark-blue);
+    border-left:3px solid var(--dark-blue);
+    border-right:3px solid var(--dark-blue);
+    overflow: hidden;
+}
+
+div#formPatient div.liste-usagers, div#formMedecin div.liste-usagers {
+    padding-bottom:30px;
+}
+/* */
+
+
 p.nbResultat {
 	text-align: center;
 	margin:0 500px;
@@ -196,5 +213,4 @@ a.detail {
 	color:#fafafa;
 	text-decoration: underline;
 }
-
 
