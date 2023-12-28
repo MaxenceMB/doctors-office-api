@@ -23,6 +23,11 @@ a {
 button {
 	margin:0;
 	padding:0;
+	font-family: 'Fredoka', sans-serif;
+}
+
+input[type="submit"] {
+	font-family: 'Fredoka', sans-serif;
 }
 
 
@@ -40,12 +45,12 @@ header {
 }
 
 header h3 {
-	flex:0.7;
+	flex:0.5;
 }
 
 
 header nav {
-	flex:0.3;
+	flex:0.5;
 	justify-content: flex-end;
 }
 
@@ -91,7 +96,7 @@ header nav ul li a {
 
 
 main {
-	padding:50px 150px;
+	padding:35px 100px;
 }
 
 
@@ -216,6 +221,17 @@ main {
 .rednoshadow:hover {
 	background-color:white;
 	color:#e74c3c;
+}
+
+.greennoshadow {
+	background-color:#2ecc71;
+	color:white;
+	border:1px solid #2ecc71;
+}
+
+.greennoshadow:hover {
+	background-color:white;
+	color:#2ecc71;
 }
 
 /*** FOOTER ***/
