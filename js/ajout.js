@@ -1,4 +1,5 @@
 function showTab(nom) {
+    window.history.replaceState({}, document.title, window.location.pathname + '?type='+nom.toLowerCase());
     current = document.getElementById("current")
     buttons = document.getElementById("tabs").children
 
@@ -18,7 +19,7 @@ function showTab(nom) {
 
         if(nom == "Patient") {
             itemsPatients.forEach((item) => {
-                item.style.display = "flex"
+                item.style.display = "block"
             })
             document.getElementById("formPatient").style.display = "block";
 
@@ -31,7 +32,7 @@ function showTab(nom) {
             })
 
             itemsMedecins.forEach((item) => {
-                item.style.display = "flex"
+                item.style.display = "block"
             })
             document.getElementById("formMedecin").style.display = "block";
         }
