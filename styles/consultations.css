@@ -1,0 +1,49 @@
+div.liste-usagers {
+	display: block;
+}
+
+div.liste-usagers > p.nbResultat {
+	margin: 1%;
+}
+
+div.liste-usagers > div#createButton {
+	margin-bottom: 3%;
+}
+
+div.liste-usagers > table {
+	margin: 0 auto;
+}
+
+table {
+	border: 1px solid var(--blue);
+	color: white;
+}
+
+table th {
+	min-width: 150px;
+	border: 1px solid var(--blue);
+	padding: 10px;
+	background-color: var(--blue);
+}
+
+table th:nth-child(3) {
+	min-width: 100px;
+}
+
+table a {
+	color: white;
+	text-decoration: underline;
+}
+
+table td {
+	border: 1px solid var(--blue);
+	padding: 10px;
+}
+
+table tr:nth-child(odd) {
+	background-color: var(--dark-blue);
+}
+
+table tr {
+    background-color: var(--very-dark-blue); 
+}
