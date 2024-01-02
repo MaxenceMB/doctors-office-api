@@ -85,7 +85,6 @@ function deleteMedecin(button) {
 function annulationSuppression(button) {
 	const backgroundToBlur = document.querySelectorAll('main *:not(#suppression)');
 
-	// Appliquez le style de flou à chaque élément sélectionné
 	backgroundToBlur.forEach(element => {
 	    element.style.filter = 'none';
 	});

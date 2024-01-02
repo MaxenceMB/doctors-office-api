@@ -30,6 +30,22 @@ table th:nth-child(3) {
 	min-width: 100px;
 }
 
+table th:nth-child(6) {
+	min-width: 50px;
+}
+
+table th:nth-child(7) {
+	min-width: 50px;
+}
+
+table td:nth-child(6) {
+	text-align: center;
+}
+
+table td:nth-child(7) {
+	text-align: center;
+}
+
 table a {
 	color: white;
 	text-decoration: underline;
@@ -40,10 +56,20 @@ table td {
 	padding: 10px;
 }
 
+
+
 table tr:nth-child(odd) {
 	background-color: var(--dark-blue);
 }
 
-table tr {
+table tr:nth-child(even) {
     background-color: var(--very-dark-blue); 
+}
+
+table tr:nth-child(odd) .bluenoshadow {
+    background-color: var(--very-dark-blue); 
+}
+
+table tr:nth-child(odd) .bluenoshadow:hover {
+    background-color: white; 
 }

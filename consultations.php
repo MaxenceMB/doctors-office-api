@@ -1,3 +1,6 @@
+<?php include "session.php";?>
+<?php include 'getlinkpdo.php';?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,13 +14,12 @@
 
 <body>
     <?php include "header.php";?>
-    <?php include 'getlinkpdo.php';?>
 
     <div id="suppression">
-        <p>Voulez-vous vraiment supprimer cette personne ?</p>
+        <p>Voulez-vous vraiment supprimer cette consultation ?</p>
         <div>
-            <button onclick="annulationSuppression(this)" href="#" class="btna rednoshadow">Non</button>
-            <form method="GET" action="suppression.php"><input id="personneASupprimer" name="" type="hidden" value=""><input type="submit" value="Oui" class="btna greennoshadow"></form>
+            <button onclick="annulationSuppression(this)" class="btna rednoshadow">Non</button>
+            <form method="GET" action="suppression.php"><input id="consultationMedecinASupprimer" name="idMedecin" type="hidden" value=""><input id="consultationPatientASupprimer" name="idPatient" type="hidden" value=""><input id="consultationDateRDV" name="dateRDV" type="hidden" value=""><input id="consultationHeureRDV" name="heureRDV" type="hidden" value=""><input type="submit" value="Oui" class="btna greennoshadow"></form>
         </div>
     </div>
 
@@ -95,7 +97,7 @@
             <!-- ----------------------------------------------------- -->
             <!-- PATIENT: ONGLET PATIENT                               -->
             <!-- ----------------------------------------------------- -->
-            <div class="Patient" id="formPatient">
+            <div class="Patient" id="formConsultation">
                 <!-- ----------------------------------------------------- -->
                 <!-- PATIENT: FORMULAIRE DE RECHERCHE                      -->
                 <!-- ----------------------------------------------------- -->
@@ -299,11 +301,21 @@
                 } else {
                     $res = $linkpdo->prepare("SELECT * FROM consultation ORDER BY dateRDV desc, heureRDV desc");
                     $res->execute();
+
+                    if (isset($_GET['consultationSuppr'])) {
+                        if ($_GET['consultationSuppr'] == "error") {
                     ?>
-
+                    <p class="nbResultat nbResultatRed">❌ Une erreur s'est produite lors de la suppression de la consultation</p>
+                    <?php 
+                        } else {
+                    ?>
+                    <p class="nbResultat nbResultatGreen">✔️ La consultation a bien été supprimée</p>
+                    <?php 
+                    }} else {
+                    ?>
                     <p class="nbResultat">Voici la liste des <?php echo $res->rowcount() ?> consultations du cabinet médical</p>
-
-                    <?php } ?>
+                <?php }
+                } ?>
 
 
 
@@ -322,6 +334,8 @@
                       <th>Durée</th>
                       <th>Médecin</th>
                       <th>Patient</th>
+                      <th>Modification</th>
+                      <th>Suppression</th>
                     </tr>
                    </thead>
                    <tbody>
@@ -344,6 +358,8 @@
                         <td><?php echo (intdiv($data['duree'], 60) == 0 ? "" : intdiv($data['duree'], 60)."h").($data['duree'] % 60 == 0 ? "" : ($data['duree'] % 60)."m"); ?></td>
                         <td><a href="affichage.php?type=medecin&id=<?php echo $data['idMedecin']; ?>"><?php echo $medecinString ?></a></td>
                         <td><?php echo $patientString ?></td>
+                        <td><button class="btna bluenoshadow">Modifier</button></td>
+                        <td><button onclick="deleteConsultation(this)" data-patient-id="<?php echo $data['idPatient']; ?>" data-medecin-id="<?php echo $data['idMedecin']; ?>" data-daterdv="<?php echo $data['dateRDV']; ?>" data-heurerdv="<?php echo $data['heureRDV']; ?>" class="btna rednoshadow">Supprimer</button></td>
                     </tr>
                     <?php
                     }

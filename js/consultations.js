@@ -27,9 +27,35 @@ function checkValidConsultation() {
 		) {
 			document.getElementsByClassName("nbResultat")[0].innerText = "❌ Merci de renseigner une recherche"
 			document.getElementsByClassName("nbResultat")[0].style.color = "red"
-			return false;	
+			return false;
 	}
 
 	document.getElementsByClassName("nbResultat")[0].style.color = "none"
 	return true
+}
+
+
+
+function deleteConsultation(button) {
+	const backgroundToBlur = document.querySelectorAll('main *:not(#suppression)');
+
+	backgroundToBlur.forEach(element => {
+	    element.style.filter = 'blur(0.5rem)';
+	});
+	document.getElementById("suppression").style.display = "block"
+	document.getElementById("consultationPatientASupprimer").value = button.getAttribute('data-patient-id');
+	document.getElementById("consultationMedecinASupprimer").value = button.getAttribute('data-medecin-id');
+	document.getElementById("consultationDateRDV").value = button.getAttribute('data-daterdv');
+	document.getElementById("consultationHeureRDV").value = button.getAttribute('data-heurerdv');
+}
+
+function annulationSuppression(button) {
+	const backgroundToBlur = document.querySelectorAll('main *:not(#suppression)');
+
+	backgroundToBlur.forEach(element => {
+	    element.style.filter = 'none';
+	});
+
+	document.getElementById("suppression").style.display = "none"
+	// pas besoin de remettre toutes les values à "", elles seront réassigné (si l'utilisateur remet #suppression en display block et valide c'est sa faute)
 }

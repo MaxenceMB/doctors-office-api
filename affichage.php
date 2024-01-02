@@ -1,3 +1,6 @@
+<?php include "session.php";?>
+<?php include 'getlinkpdo.php';?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,18 +25,18 @@
     ?>
 
     <?php include "header.php";?>
-    <?php include 'getlinkpdo.php';?>
+
+
 
     <div id="suppression">
         <p>Voulez-vous vraiment supprimer cette personne ?</p>
         <div>
-            <button onclick="annulationSuppression(this)" href="#" class="btna rednoshadow">Non</button>
+            <button onclick="annulationSuppression(this)" class="btna rednoshadow">Non</button>
             <form method="GET" action="suppression.php"><input id="personneASupprimer" name="" type="hidden" value=""><input type="submit" value="Oui" class="btna greennoshadow"></form>
         </div>
     </div>
 
     <main>
-
         <!-- ----------------------------------------------------- -->
         <!-- PATIENT: AFFICHAGE DE LA NAVIGATION ACTUEL DE LA PAGE -->
         <!-- ----------------------------------------------------- -->
