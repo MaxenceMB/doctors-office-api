@@ -8,7 +8,14 @@
 ?>
 
 <header id="header">
-	<h3 id="header-title">Cabinet médical de Mac-Sens et Haine-Zoo</h3>
+	<h3 id="header-title">
+		Cabinet médical de Mac-Sens et Haine-Zoo
+		<?php if (isset($_SESSION['username']) && $_SESSION['username'] == 'root' && $_SESSION['password'] == 'root') { ?>	
+
+
+		<?php } ?>
+	</h3>
+		<form method="GET" action="index.php"><img src="images/compte.png"> <input type="submit" name="disconnect" value="Déconnexion"></form>
 
 	<nav>
 		<ul>
@@ -35,3 +42,5 @@
 		</ul>
 	</nav>
 </header>
+
+<img id="background" src="images/background3.jpg">

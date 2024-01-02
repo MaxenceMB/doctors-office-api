@@ -131,7 +131,9 @@ section.mainSubject {
 
 
 /* Complétion du système de Tabs */
-div#formPatient, div#formMedecin {
+div#formPatient, div#formMedecin, div#formConsultation {
+    background-color: white;
+
     border-bottom-left-radius:  5px;
     border-bottom-right-radius: 5px;
     border-bottom:50px solid var(--blue);
@@ -140,15 +142,9 @@ div#formPatient, div#formMedecin {
     overflow: hidden;
 }
 
-div#formPatient div.liste-usagers, div#formMedecin div.liste-usagers {
+div#formPatient div.liste-usagers, div#formMedecin div.liste-usagers, div#formConsultation div.liste-usagers {
     padding-bottom:30px;
 }
-
-div#formPatient {
-    transition:all 1s linear;
-}
-/* */
-
 
 p.nbResultat {
   text-align: center;

@@ -2,10 +2,18 @@
 /*** VARIABLES ***/
 :root {
     --secondary-color: #f0f0f0;
-    --blue:      #3498db;
+    --blue:      #3498db; /* 52, 152, 219 */
+    --blue-opacity-reduce: rgba(52, 152, 219, 0.65);
+    --blue-opacity-rereduce: rgba(52, 152, 219, 0.2);
     --dark-blue: #2980b9;
     --very-dark-blue: #1f608b;
     --link-color: #468ed6;
+}
+
+#background {
+	width: 100%;
+	position: fixed;
+	z-index: -1;
 }
 
 body {
@@ -94,9 +102,22 @@ header nav ul li a {
 	padding:30px;
 }
 
+header form {
+	display: inline-block;
+}
+
+header form input {
+	padding: 3px;
+}
+
+header form img {
+	vertical-align: middle;
+	width: 17px;
+}
 
 main {
 	padding:35px 100px;
+	background-color: rgba(255, 255, 255, 0.8);
 }
 
 
