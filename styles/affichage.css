@@ -1,0 +1,344 @@
+section.path > span{
+  font-size: 20px;
+  padding-left: 13px;
+  padding-right: 13px;
+}
+
+section.path > a {
+    text-decoration: underline;
+    font-size: 15px;
+}
+
+section.mainSubject {
+  padding: 15px 50px;
+}
+
+.research .flex-research {
+  display:flex;
+  justify-content: space-around;
+  flex-flow: row wrap;
+  align-items: center;
+  margin:3% 20%;
+}
+
+.research .flex-research div {
+  flex:0;
+  display:flex;
+  flex-flow:column wrap;
+  text-align: center;
+  color:rgba(52, 152, 219,1.0);
+}
+
+.research .flex-research .searchinput {
+  flex:0.8;
+}
+
+.research .flex-research label {
+  font-size:10px;
+  color:;
+  margin:5px;
+}
+
+.research .flex-research input {
+  padding:8px;
+  background:rgba(52, 152, 219,0.8);
+  color:white;
+  border:1px solid rgba(52, 152, 219,1);
+  outline:none;
+  border-radius:3px;
+
+  transition:0.2s all linear;
+}
+
+.research .flex-research input:hover {
+  background:rgba(41, 128, 185,1.0)
+}
+
+.research .flex-research input:focus {
+  background-color:white;
+  color:rgba(52, 152, 219,0.8);
+}
+
+.research .flex-research select {
+  background:rgba(52, 152, 219,1.0);
+  color:white;
+  border-radius:3px;
+  border:none;
+  padding:10px;
+  overflow-y: scroll;
+  /* Pour firefox */
+  scrollbar-color: white rgba(52, 152, 219,1);
+  scrollbar-width:thin;
+}
+
+
+/* Pour chrome, Safari, etc */
+.research .flex-research select::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.research .flex-research select::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 5px;
+}
+
+.research .flex-research select::-webkit-scrollbar-track {
+  background-color: rgba(52, 152, 219,1);
+}
+/*
+.research .flex-research select::-webkit-scrollbar-button {
+  background-color: #4d7fff;
+  border-radius: 5px;
+}
+*/
+
+
+
+
+.research .flex-research select:hover {
+  background:rgba(41, 128, 185,1.0);
+}
+
+.research .submit {
+  text-align:center;
+  margin-bottom:2%;
+}
+
+.research .submit input, div.liste-usagers > #createButton > a {
+  width: 4rem;
+  height: 4rem;
+  background-repeat: no-repeat;
+  background-size:55%;
+  background-position: center;
+}
+
+
+.research .submit input#confirm {
+  background-image: url("../images/search.png");
+}
+.research .submit input#confirm:hover {
+  background-image: url("../images/searchHover.png");
+}
+
+.research .submit input#reset {
+  background-image: url("../images/restart.png");
+}
+.research .submit input#reset:hover {
+  background-image: url("../images/restartHover.png");
+}
+
+
+
+/* Complétion du système de Tabs */
+div#formPatient, div#formMedecin, div#formConsultation {
+    background-color: white;
+
+    border-bottom-left-radius:  5px;
+    border-bottom-right-radius: 5px;
+    border-bottom:50px solid var(--blue);
+    border-left:3px solid var(--dark-blue);
+    border-right:3px solid var(--dark-blue);
+    overflow: hidden;
+}
+
+div#formPatient div.liste-usagers, div#formMedecin div.liste-usagers, div#formConsultation div.liste-usagers {
+    padding-bottom:30px;
+}
+
+p.nbResultat {
+  text-align: center;
+  margin:0 500px;
+  flex:1 0 100%;
+}
+
+p.nbResultatRed {
+    color: red;
+}
+
+p.nbResultatGreen {
+    color: green;
+}
+
+
+div.liste-usagers {
+  display:flex;
+  flex-flow:row wrap;
+  justify-content:center;
+  align-items:center;
+  gap:20px;
+}
+
+div.liste-usagers > div {
+  flex:0 0 20%;
+  color:white;
+  border-radius:5px;
+  cursor:crosshair;
+}
+
+div.liste-usagers > #createButton {
+  text-align:center;
+  opacity:0.8;
+}
+
+div.liste-usagers > #createButton > a {
+  background-image: url("../images/plus.png");
+  font-size:9px;
+  background-position: bottom center;
+  padding:15px;
+}
+div.liste-usagers > #createButton > a:hover {
+  background-image: url("../images/plusHover.png");
+}
+
+div.liste-usagers > div > div {
+  padding:15px;
+  margin:0;
+}
+
+div.first-part {
+  border-top-left-radius:5px;
+  border-top-right-radius:5px;
+  background-color:rgba(41, 128, 185,1.0);
+}
+
+div.second-part {
+  display:flex;
+  justify-content: space-between;
+  border-bottom-left-radius:5px;
+  border-bottom-right-radius:5px;
+  background-color:rgba(52, 152, 219,1.0);
+}
+
+/*
+p.ville, p.adresse {
+  min-height: 10vh;
+}
+*/
+
+p.name {
+  font-size:15px;
+  font-weight: bold;
+}
+
+span.label {
+  display:block;
+  font-size:10px;
+  color:#e1e1e1;
+}
+
+span.detail {
+  font-size:12px;
+}
+
+a.detail {
+  font-size:12px;
+  color:#fafafa;
+  text-decoration: underline;
+}
+
+
+#formConsultation div.liste-usagers {
+    display: block;
+}
+
+#formConsultation div.liste-usagers > p.nbResultat {
+    margin: 1%;
+}
+
+#formConsultation  div.liste-usagers > div#createButton {
+    margin-bottom: 3%;
+}
+
+#formConsultation div.liste-usagers > table {
+    margin: 0 auto;
+}
+
+#formConsultation table {
+    border: 1px solid var(--blue);
+    color: white;
+}
+
+#formConsultation table th {
+    min-width: 150px;
+    border: 1px solid var(--blue);
+    padding: 10px;
+    background-color: var(--blue);
+}
+
+#formConsultation table th:nth-child(3) {
+    min-width: 100px;
+}
+
+#formConsultation table th:nth-child(6) {
+    min-width: 50px;
+}
+
+#formConsultation table th:nth-child(7) {
+    min-width: 50px;
+}
+
+#formConsultation table td:nth-child(6) {
+    text-align: center;
+}
+
+#formConsultation table td:nth-child(7) {
+    text-align: center;
+}
+
+#formConsultation table a {
+    color: white;
+    text-decoration: underline;
+}
+
+#formConsultation table td {
+    border: 1px solid var(--blue);
+    padding: 10px;
+}
+
+
+
+#formConsultation table tr:nth-child(odd) {
+    background-color: var(--dark-blue);
+}
+
+#formConsultation table tr:nth-child(even) {
+    background-color: var(--very-dark-blue); 
+}
+
+#formConsultation table tr:nth-child(odd) .bluenoshadow {
+    background-color: var(--very-dark-blue); 
+}
+
+#formConsultation table tr:nth-child(odd) .bluenoshadow:hover {
+    background-color: white; 
+}
+
+
+
+/* interface de confirmation de suppression */
+
+#suppression {
+    display: none;
+    position:fixed;
+    top: 50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    background:var(--blue);
+    z-index:10;
+    border-radius: 5px;
+}
+#suppression p {
+    max-width: 200px;
+    align-items: center;
+    font-size: 14px;
+    padding: 12px;
+    text-align: center;
+    color: white;
+}
+
+#suppression div {
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+}

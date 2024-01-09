@@ -1,6 +1,10 @@
 <?php
+
+$protocol="mysql:host=localhost;dbname=cabinet";
+$login="root";
+$password="";
 try {
-    $linkpdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
+    $linkpdo = new PDO($protocol, $login, $password);
 }
 catch (Exception $e) {
     die('Erreur : ' . $e->getMessage());

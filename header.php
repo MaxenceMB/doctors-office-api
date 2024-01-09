@@ -1,11 +1,12 @@
 <?php
 
-	$LINK_PATIENT = '/doctors-office-website/affichage.php';
+	$LINK_PATIENT = '/doctors-office-website/affichage.php'; /* par defaut on a ça, meme si il y a tout le temps ?type=..., c'est fait la moitié du temps en js donc php comprend pas */
 	$LINK_MEDECIN = '/doctors-office-website/affichage.php?type=medecin';
-	$LINK_CONSULTATION = '/doctors-office-website/consultations.php';
+	$LINK_CONSULTATION = '/doctors-office-website/affichage.php?type=consultation';
 	$LINK_STATISTIQUES = '/doctors-office-website/statistiques.php';
 
 ?>
+<img id="background" src="images/background3.jpg">
 
 <header id="header">
 	<h3 id="header-title">
@@ -19,8 +20,8 @@
 
 	<nav>
 		<ul>
-			<li <?php echo str_starts_with($_SERVER['REQUEST_URI'], $LINK_PATIENT) && !str_starts_with($_SERVER['REQUEST_URI'], $LINK_MEDECIN) ? 'id="currentPage"' : '';?> >
-				<a href="<?php echo str_starts_with($_SERVER['REQUEST_URI'], $LINK_PATIENT) && !str_starts_with($_SERVER['REQUEST_URI'], $LINK_MEDECIN) ? '#' : 'affichage.php?type=patient'?>">
+			<li <?php echo str_starts_with($_SERVER['REQUEST_URI'], $LINK_PATIENT) && !str_starts_with($_SERVER['REQUEST_URI'], $LINK_MEDECIN) && !str_starts_with($_SERVER['REQUEST_URI'], $LINK_CONSULTATION) ? 'id="currentPage"' : '';?> >
+				<a href="<?php echo str_starts_with($_SERVER['REQUEST_URI'], $LINK_PATIENT) && !str_starts_with($_SERVER['REQUEST_URI'], $LINK_MEDECIN) && !str_starts_with($_SERVER['REQUEST_URI'], $LINK_CONSULTATION) ? '#' : 'affichage.php?type=patient'?>">
 					Usagers
 				</a>
 			</li>
@@ -30,7 +31,7 @@
 				</a>
 			</li>
 			<li <?php echo str_starts_with($_SERVER['REQUEST_URI'], $LINK_CONSULTATION) ? 'id="currentPage"' : '';?> >
-				<a href="<?php echo str_starts_with($_SERVER['REQUEST_URI'], $LINK_CONSULTATION) ? '#' : 'consultations.php'?>">
+				<a href="<?php echo str_starts_with($_SERVER['REQUEST_URI'], $LINK_CONSULTATION) ? '#' : 'affichage.php?type=consultation'?>">
 					Consultations
 				</a>
 			</li>
@@ -43,4 +44,3 @@
 	</nav>
 </header>
 
-<img id="background" src="images/background3.jpg">

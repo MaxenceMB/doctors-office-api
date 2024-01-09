@@ -56,6 +56,41 @@ function checkValidMedecin() {
 	return true
 }
 
+function checkValidConsultation() {
+	if (!fromButtonSearch) {
+		return true;
+	}
+
+	const startDateFilter = document.getElementById("startDate")
+	const endDateFilter = document.getElementById("endDate")
+	const startHoursFilter = document.getElementById("startHours")
+	const endHoursFilter = document.getElementById("endHours")
+	const startDureeFilter = document.getElementById("startDuree")
+	const endDureeFilter = document.getElementById("endDuree")
+
+
+	const medecinConsultationFilter = document.getElementById("medecinConsultation")
+	const patientConsultationFilter = document.getElementById("patientConsultation")
+
+	if (startDateFilter.value === "" &&
+		endDateFilter.value === "" &&
+		startHoursFilter.value === "" &&
+		endHoursFilter.value === "" &&
+		startDureeFilter.options[startDureeFilter.selectedIndex].text === "Indifférent" &&
+		endDureeFilter.options[endDureeFilter.selectedIndex].text === "Indifférent" &&
+		medecinConsultationFilter.options[medecinConsultationFilter.selectedIndex].text === "Indifférent" &&
+		patientConsultationFilter.options[patientConsultationFilter.selectedIndex].text === "Indifférent"
+		) {
+			document.getElementsByClassName("nbResultat")[0].innerText = "❌ Merci de renseigner une recherche"
+			document.getElementsByClassName("nbResultat")[0].style.color = "red"
+			return false;
+	}
+
+	document.getElementsByClassName("nbResultat")[0].style.color = "none"
+	return true
+}
+
+
 
 
 function deletePatient(button) {
@@ -64,10 +99,13 @@ function deletePatient(button) {
 	backgroundToBlur.forEach(element => {
 	    element.style.filter = 'blur(0.5rem)';
 	});
-	document.getElementById("suppression").style.display = "block"
-	let id = button.getAttribute('data-patient-id');
-	document.getElementById("personneASupprimer").name = "idPatient";
-	document.getElementById("personneASupprimer").value = id;
+
+	let supprParagraph = document.getElementById("suppression");
+	supprParagraph.style.display = "block"
+	supprParagraph.children[0].innerText = "Voulez-vous vraiment supprimer ce patient ? Cela engendrera la suppression de ses consultations s'il en possède.";
+
+	document.getElementById("patientSuppr").name = "idPatient";
+	document.getElementById("patientSuppr").value = button.getAttribute('data-patient-id');
 }
 
 function deleteMedecin(button) {
@@ -76,10 +114,35 @@ function deleteMedecin(button) {
 	backgroundToBlur.forEach(element => {
 	    element.style.filter = 'blur(0.5rem)';
 	});
-	document.getElementById("suppression").style.display = "block"
-	let id = button.getAttribute('data-patient-id');
-	document.getElementById("personneASupprimer").name = "idMedecin";
-	document.getElementById("personneASupprimer").value = id;
+
+	let supprParagraph = document.getElementById("suppression");
+	supprParagraph.style.display = "block"
+	supprParagraph.children[0].innerText = "Voulez-vous vraiment supprimer ce médecin ? Cela engendrera la suppression de ses consultations s'il en possède et certains patients n'auront plus de médecin traitant.";
+
+	document.getElementById("medecinSuppr").name = "idMedecin";
+	document.getElementById("medecinSuppr").value = button.getAttribute('data-patient-id');
+}
+
+
+function deleteConsultation(button) {
+	const backgroundToBlur = document.querySelectorAll('main *:not(#suppression)');
+
+	backgroundToBlur.forEach(element => {
+	    element.style.filter = 'blur(0.5rem)';
+	});
+
+	let supprParagraph = document.getElementById("suppression");
+	supprParagraph.style.display = "block"
+	supprParagraph.children[0].innerText = "Voulez-vous vraiment supprimer cette consultation ?";
+
+	document.getElementById("patientSuppr").name = "idPatient";
+	document.getElementById("patientSuppr").value = button.getAttribute('data-patient-id');
+	document.getElementById("medecinSuppr").name = "idMedecin";
+	document.getElementById("medecinSuppr").value = button.getAttribute('data-medecin-id');
+	document.getElementById("consultationDateRDV").name = "dateRDV";
+	document.getElementById("consultationDateRDV").value = button.getAttribute('data-daterdv');
+	document.getElementById("consultationHeureRDV").name = "heureRDV";
+	document.getElementById("consultationHeureRDV").value = button.getAttribute('data-heurerdv');
 }
 
 function annulationSuppression(button) {
@@ -90,6 +153,13 @@ function annulationSuppression(button) {
 	});
 
 	document.getElementById("suppression").style.display = "none"
-	document.getElementById("personneASupprimer").name = "";
-	document.getElementById("personneASupprimer").value = "";
+
+	document.getElementById("patientSuppr").name = "";
+	document.getElementById("patientSuppr").value = "";
+	document.getElementById("medecinSuppr").name = "";
+	document.getElementById("medecinSuppr").value = "";
+	document.getElementById("consultationDateRDV").name = "";
+	document.getElementById("consultationDateRDV").value = "";
+	document.getElementById("consultationHeureRDV").name = "";
+	document.getElementById("consultationHeureRDV").value = "";
 }

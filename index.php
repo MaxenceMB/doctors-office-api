@@ -1,5 +1,11 @@
 <?php 
 session_start();
+
+if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['password'] == "root") {
+	$_SESSION['username'] = $_POST['username'];
+	$_SESSION['password'] = $_POST['password'];
+	header("Location: affichage.php");
+}
 ?>
 
 <!DOCTYPE html>
@@ -8,7 +14,7 @@ session_start();
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="styles/styles.css">
-	<link rel="stylesheet" type="text/css" href="styles/vrai_index.css">
+	<link rel="stylesheet" type="text/css" href="styles/index.css">
 	<title>ddd</title>
 </head>
 <body>
@@ -37,14 +43,8 @@ session_start();
 						Le mot de passe est invalide
 					</div>
 					<?php
-						} else {
-							$_SESSION['username'] = $_POST['username'];
-   							$_SESSION['password'] = $_POST['password'];
-							header("Location: affichage.php");
 						}
 					}
-
-
 				?>
 				
 
