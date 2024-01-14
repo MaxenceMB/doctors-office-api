@@ -1,73 +1,143 @@
 <?php
 
-    // Vérifie le format du nom
+    /**********************************************
+     * CHECK NOM
+     * Vérifie qu'un nom (ou prénom) ne soit pas vide,
+     * trop long ou contienne des caractères interdits
+     * 
+     * - Prend la variable à vérifier (le nom ou prénom) en argument (+ son appélation pour l'affichage)
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkNom($nom, $nomVariable) {
         $result = "";
 
-        $nomspe = str_replace("-", "", str_replace(" ", "", $nom));
-        if(strlen($nomspe) == 0) { $result .= "Le ".$nomVariable." ne peut pas être vide.<br>"; }                                            // Vide
-        if(strlen($nom) > 20) { $result .= "Le ".$nomVariable." ne peut pas dépasser 20 caractères.<br>"; }                                  // Trop long
-        if(preg_match('/[^a-zA-Zà-üÀ-Ü -]+/', $nom, $matches)) { $result .= "Le ".$nomVariable." contient des charactères interdits.<br>"; } // Caractères spéciaux
-
+        $nomspe = str_replace("-", "", str_replace(" ", "", $nom));                                                                             //////////////////////////
+        if(strlen($nomspe) == 0) { $result .= "Le ".$nomVariable." ne peut pas être vide.<br>"; }                                               // Vide                 //
+        if(strlen($nom) > 20) { $result .= "Le ".$nomVariable." ne peut pas dépasser 20 caractères.<br>"; }                                     // Trop long            //
+        if(preg_match('/[^a-zA-Zà-üÀ-Ü -]+/', $nom, $matches)) { $result .= "Le ".$nomVariable." contient des charactères interdits.<br>"; }    // Caractères spéciaux  //
+                                                                                                                                                //////////////////////////
         return $result;
     }
 
-    // Vérifie le format de la civilité
-    function checkCivilite($civilite) {
-        if($civilite != "Mme" && $civilite != "M") { return "La valeur civilité est invalide.<br>"; } // Format invalide
-        return "";
+
+    /**********************************************
+     * CHECK CIVILITE
+     * Vérifie que la valeur civilité soit conforme (soit 'M' soit 'Mme')
+     * 
+     * - Prend la variable à vérifier (la civilité) en argument
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
+    function checkCivilite($civilite) {                                                                                                         //////////////////////////
+        if($civilite != "Mme" && $civilite != "M") { return "La valeur civilité est invalide.<br>"; }                                           // Format invalide      //
+        return "";                                                                                                                              //////////////////////////
     }
 
-    // Vérifie le format de l'adresse
+
+    /**********************************************
+     * CHECK ADRESSE
+     * Vérifie que l'adresse ne soit pas vide, trop
+     * longue ou contienne des caractères interdits
+     * 
+     * - Prend la variable à vérifier (l'adresse) en argument
+     *   plus un 'booléen', vrai si c'est l'adresse principale et faux si c'est la complémentaire
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkAdresse($adresse, $primaire) {
         $result = "";
         
-        $adspe = str_replace("-", "", str_replace(" ", "", $adresse));  
-        if(strlen($adspe) == 0 && $primaire) { $result .= "L'adresse ne peut pas être vide.<br>"; }                                       // Vide
-        if(strlen($adresse) > 30) { $result .= "L'adresse ne peut pas dépasser 30 caractères.<br>"; }                                     // Trop long    
-        if(preg_match('/[^a-zA-Zà-üÀ-Ü0-9 -]+/', $adresse, $matches)) { $result .= "L'adresse contient des charactères interdits.<br>"; } // Caractères spéciaux
-
+        $adspe = str_replace("-", "", str_replace(" ", "", $adresse));                                                                          //////////////////////////
+        if(strlen($adspe) == 0 && $primaire) { $result .= "L'adresse ne peut pas être vide.<br>"; }                                             // Vide                 //
+        if(strlen($adresse) > 30) { $result .= "L'adresse ne peut pas dépasser 30 caractères.<br>"; }                                           // Trop long            //
+        if(preg_match('/[^a-zA-Zà-üÀ-Ü0-9 -]+/', $adresse, $matches)) { $result .= "L'adresse contient des charactères interdits.<br>"; }       // Caractères spéciaux  //
+                                                                                                                                                //////////////////////////
         return $result;
     }
 
-    // Vérifie le format des noms de ville
+
+    /**********************************************
+     * CHECK VILLE
+     * Vérifie que la ville spécifiée ne soit pas vide,
+     * trop longue ou contienne des caractères interdits
+     * 
+     * - Prend la variable à vérifier (la ville) en argument (+ son appélation pour l'affichage)
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkVille($ville, $nomVariable) {
         $result = "";
 
-        $villespe = str_replace("-", "", str_replace(" ", "", $ville));  
-        if($villespe == "") { $result .= "La ".$nomVariable." ne peut pas être vide.<br>"; }                                                   // Vide
-        if(strlen($ville) > 20) { $result .= "La ".$nomVariable." ne peut pas dépasser 20 caractères.<br>"; }                                  // Trop long
-        if(preg_match('/[^a-zA-Zà-üÀ-Ü -]+/', $ville, $matches)) { $result .= "La ".$nomVariable." contient des charactères interdits.<br>"; } // Caractères spéciaux
-
+        $villespe = str_replace("-", "", str_replace(" ", "", $ville));                                                                         //////////////////////////
+        if($villespe == "") { $result .= "La ".$nomVariable." ne peut pas être vide.<br>"; }                                                    // Vide                 //
+        if(strlen($ville) > 20) { $result .= "La ".$nomVariable." ne peut pas dépasser 20 caractères.<br>"; }                                   // Trop long            //
+        if(preg_match('/[^a-zA-Zà-üÀ-Ü -]+/', $ville, $matches)) { $result .= "La ".$nomVariable." contient des charactères interdits.<br>"; }  // Caractères spéciaux  //
+                                                                                                                                                //////////////////////////
         return $result;
     }
 
-    // Vérifie le format du code postal
+
+    /**********************************************
+     * CHECK CIVILITE
+     * Vérifie que la valeur civilité soit conforme (soit 'M' soit 'Mme')
+     * 
+     * - Prend la variable à vérifier (la civilité) en argument
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkCodePostal($cp) {
         $result = "";
-
-        if(strlen($cp) != 5) { $result .= "La taille du code postal est invalide.<br>"; }                                   // Taille invalide
-        if(preg_match('/[^0-9]+/', $cp, $matches)) { $result .= "Le code postal contient des charactères interdits.<br>"; } // Pas des chiffres
-
+                                                                                                                                                //////////////////////////
+        if(strlen($cp) != 5) { $result .= "La taille du code postal est invalide.<br>"; }                                                       // Taille invalide      //
+        if(preg_match('/[^0-9]+/', $cp, $matches)) { $result .= "Le code postal contient des charactères interdits.<br>"; }                     // Pas des chiffres     //
+                                                                                                                                                //////////////////////////        
         return $result;
     }
 
-    // Vérifie le format de la date de naissance
-    function checkDateNaissance($date) {
-        return "";
+
+    /**********************************************
+     * CHECK DATE NAISSANCE
+     * Vérifie que la date de naissance soit entre
+     * le 01/01/1900 et la date du jour
+     * 
+     * - Prend la variable à vérifier (la date de naissance) en argument
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
+    function checkDateNaissance($dateN) {
+        $result = "";
+                                                                                                                                                //////////////////////////
+        if(strlen($dateN) != 10) { $result .= "La taille de la date est invalide.<br>"; }                                                       // Taille invalide      //
+        if(preg_match('/[^0-9-]+/', $dateN, $matches)) { $result .= "Le date contient des charactères interdits.<br>"; }                        // Caractères spéciaux  //
+        if($dateN > date("Y-m-d")) { $result .= "La date est supérieure à la date du jour.<br>"; }                                              // Date trop élevée     //
+        if($dateN < "1900-01-01") { $result .= "La date est inférieure a la date minimum.<br>"; }                                               // Date trop ancienne   //
+                                                                                                                                                //////////////////////////
+        return $result;
     }
 
-    // Vérifie le format du numéro de sécurité sociale
+
+    /**********************************************
+     * CHECK SECURITE
+     * Vérifie que le numéro de sécurité sociale
+     * soit bien une chaine de 15 chiffres
+     * 
+     * - Prend la variable à vérifier (le numéro de sécu) en argument
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkSecurite($secu) {
         $result = "";
-
-        if(strlen($secu) != 15) { $result .= "La taille du numéro de sécurité sociale est invalide.<br>"; }                                   // Taille invalide
-        if(preg_match('/[^0-9]+/', $secu, $matches)) { $result .= "Le numéro de sécurité sociale contient des charactères interdits.<br>"; }  // Pas des chiffres
-
+                                                                                                                                                //////////////////////////
+        if(strlen($secu) != 15) { $result .= "La taille du numéro de sécurité sociale est invalide.<br>"; }                                     // Taille invalide      //
+        if(preg_match('/[^0-9]+/', $secu, $matches)) { $result .= "Le numéro de sécurité sociale contient des charactères interdits.<br>"; }    // Pas des chiffres     //
+                                                                                                                                                //////////////////////////
         return $result;
     }
 
-    // Vérifie l'id médecin
+
+    /**********************************************
+     * CHECK ID MEDECIN
+     * Vérifie que l'id médecin indiqué soit valide, soit:
+     * - égal à -1 pour aucun
+     * - Ou juste existant
+     * 
+     * - Prend la variable à vérifier (l'id médecin') en argument
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkIdMedecin($medecin) {
         include 'getlinkpdo.php';
 
@@ -76,17 +146,29 @@
                                   FROM   medecin
                                   WHERE  idMedecin = :idMedecin;');
 
-        $req->execute(array(':idMedecin' => $medecin));
-        if ($req->rowCount() == 0 && $medecin != -1) {
-            return "Le médecin n'existe pas.<br>";
+        $req->execute(array(':idMedecin' => $medecin));                                                                                         //////////////////////////
+        if ($req->rowCount() == 0 && $medecin != -1) {                                                                                          // Introuvable & pas -1 //
+            return "Le médecin n'existe pas.<br>";                                                                                              //////////////////////////
         }
 
         return "";
     }
 
 
-    // Nouveau patient
-    // Vérifie les formats du nom, prénom, civilité, adresses, ville, code postal, ville et date de naissance, numéro de sécu et l'id médecin traitant.
+    /**********************************************
+     * CHECK PATIENT
+     * Vérifie les formats du nom, prénom, civilité,
+     * adresses, ville, code postal, ville et date de naissance,
+     * numéro de sécu et l'id médecin traitant
+     * 
+     * Pour ce faire, il effectue les tests sur tous les champs
+     * les uns après les autres et concatènes les messages d'erreurs
+     * rencontrés. Si un string vide est renvoyé, ça veut dire que tout
+     * est passé sans problème
+     * 
+     * - Prend le $_POST de la page ajout en argument
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkPatient($PATIENT) {
         include 'getlinkpdo.php';
 
@@ -118,8 +200,18 @@
     }
 
 
-    // Nouveau médecin
-    // Vérifie les formats du nom, prénom et la civilité.
+    /**********************************************
+     * CHECK MEDECIN
+     * Vérifie les formats du nom, prénom et la civilité
+     * 
+     * Pour ce faire, il effectue les tests sur tous les champs
+     * les uns après les autres et concatènes les messages d'erreurs
+     * rencontrés. Si un string vide est renvoyé, ça veut dire que tout
+     * est passé sans problème
+     * 
+     * - Prend le $_POST de la page ajout en argument
+     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon
+     **********************************************/
     function checkMedecin($MEDECIN) {
         include 'getlinkpdo.php';
 

@@ -32,8 +32,8 @@
                 // Initialisation des variables
                 // Tous les inputs sont remplis avec les valeurs du patient ou médecin qu'on souhaite modifier.
                 // Mais si on ne modifie pas, juste la création pure et dure, on remplit tous les champs avec du vide.
-                $patientModif = array_fill(0, 11, "");
-                $medecinModif = array_fill(0, 3,  "");
+                $patientModif = array_fill(0, 12, "");
+                $medecinModif = array_fill(0, 4,  "");
 
                 if(isset($_GET['idModif'])) {
                     $idModif = $_GET['idModif'];
@@ -162,7 +162,7 @@
 
                             <div class = "formInput">
                                 <div class = "formLabel formSecondLabel"><label for = "dateN">Date:</label></div>
-                                <input type = "date" id = "dateN" name = "dateN" min = "1900-01-01" value = "<?php echo $patientModif[9] ?>"/>             
+                                <input type = "date" id = "dateN" name = "dateN" value = "<?php echo $patientModif[9] ?>"/>             
                             </div>
                         </div>
                         
