@@ -163,7 +163,7 @@
                 <p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="affichage.php?type=medecin&id=<?php echo $data['idMedecin']?>" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
             </div>
             <div class="second-part">
-                <button class="btna bluenoshadow">Modifier</button>
+                <a href = "ajout.php?type=patient"><button class="btna bluenoshadow">Modifier</button></a> <!-- !!!!! ENVOYER L'ID DU PATIENT !!!!! -->
                 <button onclick="deletePatient(this)" data-patient-id="<?php echo $data['idPatient']; ?>" class="btna rednoshadow">Supprimer</button>
             </div>
         </div>
