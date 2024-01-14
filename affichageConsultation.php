@@ -19,7 +19,7 @@
 
             <div>
                 <label for="startHours">De</label>
-                <input type="time" id="startHours" name="startHours" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['startHours'] : '' ?>"/>
+                <input type="time" id="startHours" name="startHours" min="08:00" max="20:00" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['startHours'] : '' ?>"/>
             </div>
 
             <div>
@@ -225,7 +225,7 @@
 
 
     <div id="createButton">
-        <a href="saisieConsultation.php" class="btna blue">
+        <a href="saisie.php?type=consultation" class="btna blue">
             Ajouter une consultation
         </a>
     </div>
@@ -238,16 +238,19 @@
           <th>Durée</th>
           <th>Médecin</th>
           <th>Patient</th>
-          <th>Modification</th>
-          <th>Suppression</th>
+          <th>Actions</th>
         </tr>
        </thead>
        <tbody>
     <?php
 
         while ($data = $res->fetch()) {
-            $resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM medecin WHERE idMedecin = :idMedecin");
-            $resMedecinString->execute(array('idMedecin' => $data['idMedecin']));
+            try {
+                $resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM medecin WHERE idMedecin = :idMedecin");
+                $resMedecinString->execute(array('idMedecin' => $data['idMedecin']));
+            } catch (Exception $e) {
+                echo "Une erreur est survenue.";
+            }
             $resultMedecin = $resMedecinString->fetch();
             $resPatientString = $linkpdo->prepare("SELECT nom, prenom, civilite FROM patient WHERE idPatient = :idPatient");
             $resPatientString->execute(array('idPatient' => $data['idPatient']));
@@ -259,11 +262,14 @@
         <tr>
             <td><?php echo date("d/m/Y", strtotime($data['dateRDV'])) ?></td>
             <td><?php echo $data['heureRDV'] ?></td>
-            <td><?php echo (intdiv($data['duree'], 60) == 0 ? "" : intdiv($data['duree'], 60)."h").($data['duree'] % 60 == 0 ? "" : ($data['duree'] % 60)."m"); ?></td>
+
+            <td><?php echo sprintf("%02dh%02dm", intdiv($data['duree'], 60), $data['duree']%60); ?></td>
             <td><a href="affichage.php?type=medecin&id=<?php echo $data['idMedecin']; ?>"><?php echo $medecinString ?></a></td>
             <td><?php echo $patientString ?></td>
-            <td><button class="btna bluenoshadow">Modifier</button></td>
-            <td><button onclick="deleteConsultation(this)" data-patient-id="<?php echo $data['idPatient']; ?>" data-medecin-id="<?php echo $data['idMedecin']; ?>" data-daterdv="<?php echo $data['dateRDV']; ?>" data-heurerdv="<?php echo $data['heureRDV']; ?>" class="btna rednoshadow">Supprimer</button></td>
+            <td>
+                <button class="btna bluenoshadow inside-button-modifier"></button>
+                <button onclick="deleteConsultation(this)" data-patient-id="<?php echo $data['idPatient']; ?>" data-medecin-id="<?php echo $data['idMedecin']; ?>" data-daterdv="<?php echo $data['dateRDV']; ?>" data-heurerdv="<?php echo $data['heureRDV']; ?>" class="btna rednoshadow inside-button-supprimer"></button>
+            </td>
         </tr>
         <?php
         }

@@ -1,10 +1,14 @@
 <?php 
 session_start();
 
+if (isset($_SESSION['username']) && $_SESSION['username'] == 'root' && $_SESSION['password'] == 'root') {
+	header("Location: affichage.php"); // ou ./ mais pas sur si y'a 2 pages .php qui se suivent (i.php/p.php ca va revenir à i.php)
+}
+
 if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['password'] == "root") {
 	$_SESSION['username'] = $_POST['username'];
 	$_SESSION['password'] = $_POST['password'];
-	header("Location: affichage.php");
+	header("Location: affichage.php?type=patient");
 }
 ?>
 

@@ -157,14 +157,14 @@
             <div class="first-part">
                 <p class="name"><?php echo $data['civilite']." ".$data['nom']." ".$data['prenom'] ?></p>
                 <p><span class="label">Adresse</span><?php echo $data['adresse1'] ?>;<br><?php echo $data['adresse2'] ?><br><?php echo $data['ville'] ?> <?php echo $data['codePostal'] ?></p>
-                <p><span class="label">Ville de naissance</span><?php echo "Beziers" ?></p>
-                <p><span class="label">Date de naissance</span><?php echo "12/04/2004" ?></p>
+                <p><span class="label">Ville de naissance</span><?php echo $data['villeNaissance'] ?></p>
+                <p><span class="label">Date de naissance</span><?php echo date("d/m/Y", strtotime($data['dateNaissance'])) ?></p>
                 <p><span class="label">Numéro de sécu</span><?php echo $data['numSecu'] ?></p>
                 <p><span class="label">Médecin traitant</span><?php echo $medecinString  ?><?php if ($medecinString!="Aucun") { ?> <span class="detail">(</span><a href="affichage.php?type=medecin&id=<?php echo $data['idMedecin']?>" class="detail">voir fiche</a><span class="detail">)</span><?php }?></p>
             </div>
             <div class="second-part">
-                <button class="btna bluenoshadow">Modifier</button>
-                <button onclick="deletePatient(this)" data-patient-id="<?php echo $data['idPatient']; ?>" class="btna rednoshadow">Supprimer</button>
+                <button class="btna bluenoshadow inside-button-modifier"></button>
+                <button onclick="deletePatient(this)" data-patient-id="<?php echo $data['idPatient']; ?>" class="btna rednoshadow inside-button-supprimer"></button>
             </div>
         </div>
         <?php

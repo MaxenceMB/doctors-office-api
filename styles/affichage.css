@@ -307,13 +307,43 @@ a.detail {
 }
 
 #formConsultation table tr:nth-child(odd) .bluenoshadow {
-    background-color: var(--very-dark-blue); 
+    background-color: var(--very-dark-blue);
 }
 
 #formConsultation table tr:nth-child(odd) .bluenoshadow:hover {
     background-color: white; 
+    border-color: var(--very-dark-blue);
 }
 
+.inside-button-modifier, .inside-button-supprimer {
+    width: 3rem;
+  height: 3rem;
+  background-repeat: no-repeat;
+  background-size: 55%;
+  background-position: center;
+}
+.inside-button-modifier:hover {
+    transform: rotate(10deg) scale(1.1);
+}
+.inside-button-supprimer:hover {
+    transform: rotate(10deg) scale(1.1);
+}
+
+.inside-button-modifier  {
+    background-image:url("../images/modifier.png");
+}
+.inside-button-modifier:hover {
+    background-image: url("../images/modifierHover.png");
+}
+
+
+.inside-button-supprimer {
+    background-image:url("../images/supprimer.png");
+}
+
+.inside-button-supprimer:hover {
+    background-image: url("../images/supprimerHover.png");
+}
 
 
 /* interface de confirmation de suppression */
