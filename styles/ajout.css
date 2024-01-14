@@ -57,7 +57,7 @@ h2 {
     background-color: var(--dark-blue);
 }
 
-form {
+form#formPatient, form#formMedecin, form#formConsultation {
     margin:   0 auto;
     width:    1025px;
 
@@ -99,6 +99,17 @@ form {
     flex-direction: column;
 
     padding: 15px;
+}
+
+
+/* Petits titres */
+.formHeader {
+    width:  100%;
+    margin-bottom: 0;
+    font-size: 22px;
+    font-weight: bold;
+
+    border-bottom: white solid 1px;
 }
 
 
@@ -198,4 +209,41 @@ form {
 /* Les inputs "court" */
 .Medecin .shortInput {
     width: 15em;
+}
+
+/* CONSULTATION */
+/* Les inputs de Consultation */
+.Consultation .formInput {
+    display: flex;
+    align-items: center;
+
+    height: 50px;
+}
+
+/* La zone à deux inputs */
+.Consultation .formDoubleInput {
+    display: flex;
+    justify-content: space-between;
+}
+
+
+/* Les labels des inputs */
+.Consultation .formLabel {
+    width:  125px;
+    font-size: 18px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    flex: 1 0 25%;
+}
+
+.Consultation #firstColumn {
+    width: 800px;
+}
+
+/* Le deuxième label des zone à deux inputs */
+.Consultation .formSecondLabel {
+    width: auto;
+    margin-right: 15px;
 }

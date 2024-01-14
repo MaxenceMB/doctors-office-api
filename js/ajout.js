@@ -4,11 +4,10 @@ function showTab(nom) {
     buttons = document.getElementById("tabs").children
 
     if(current.textContent != nom) {
-        // Inverse le current des boutons
 
         // Inverse l'affichage
-        itemsPatients = Array.from(document.getElementsByClassName("Patient"))
-        itemsMedecins = Array.from(document.getElementsByClassName("Medecin"))
+        itemsPatients      = Array.from(document.getElementsByClassName("Patient"))
+        itemsMedecins      = Array.from(document.getElementsByClassName("Medecin"))
         itemsConsultations = Array.from(document.getElementsByClassName("Consultation"))
 
         if(nom == "Patient") {
