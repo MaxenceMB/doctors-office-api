@@ -50,24 +50,38 @@
                             //$consultation = getConsultation($idModif);
                             break;
                     }
+                } else {
+                    for($i = 0; $i < count($_POST); $i++) {
+                        $patientModif[$i] = (isset($_POST[$i])) ? $_POST[$i] : "";
+                    }
                 }
 
-                // Ajout d'un patient
+
+                // En fonction de quel bouton est cliqué, on fait des actions différentes
                 if(isset($_POST["validerPatient"])) {
-                    
+
                     $err = checkPatient($_POST);
                     if($err != "") {
-                        die($err);
+                        echo $err;
+                    } else {
+                        if(isset($_GET['idModif'])) {
+                            updatePatient($_GET['idModif'], $_POST);
+                            $patientModif = getPatient($idModif);
+                        } else {
+                            addPatient($_POST);
+                        }
                     }
-                    addPatient($_POST);
 
                 } else if(isset($_POST["validerMedecin"])) {
 
                     $err = checkMedecin($_POST);
-                    if($err != "") {
-                        die($err);
+                    if($err != "") echo $err;
+
+                    if(isset($_GET['idModif'])) {
+                        updateMedecin($_GET['idModif'], $_POST);
+                    } else {
+                        addMedecin($_POST);
                     }
-                    addMedecin($_POST);
                 }
             ?>
 
@@ -81,7 +95,7 @@
             <h2 style = "display:<?php echo $type == 'consultation' ? 'block': 'none'?>" class = "Consultation">Nouvelle consultation</h2>
 
             <!-- Formulaire principal d'ajout d'un patient -->
-            <form method = "post" action = "ajout.php?type=patient" style="display:<?php echo $type=='patient' ? 'block': 'none'?>" class = "Patient" id = "formPatient">
+            <form method = "post" action = "ajout.php?type=patient<?php echo isset($_GET['idModif']) ? '&idModif='.$_GET['idModif'] : ''?>" style="display:<?php echo $type=='patient' ? 'block': 'none'?>" class = "Patient" id = "formPatient">
                 <div class = "mainForm">
                     <div class = "formColumn">
 
@@ -176,7 +190,7 @@
             </form>
 
             <!-- Formulaire principal d'ajout d'un Medecin -->
-            <form method = "post" action = "ajout.php?type=medecin" style = "display:<?php echo $type == 'medecin' ? 'block': 'none'?>" class = "Medecin" id = "formMedecin">
+            <form method = "post" action = "ajout.php?type=medecin<?php echo isset($_GET['idModif']) ? '&idModif='.$_GET['idModif'] : ''?>" style = "display:<?php echo $type == 'medecin' ? 'block': 'none'?>" class = "Medecin" id = "formMedecin">
                 <div class = "mainForm">
                     <div class = "formInput">
                         <div class = "formLabel">Civilité:</div>
@@ -200,7 +214,7 @@
             </form>
 
             <!-- Formulaire principal de création d'une consultation -->
-            <form method = "post" action = "ajout.php?type=consultation" style="display:<?php echo $type =='consultation' ? 'block': 'none'?>" class = "Consultation" id = "formConsultation">
+            <form method = "post" action = "ajout.php?type=consultation<?php echo isset($_GET['idModif']) ? '&idModif='.$_GET['idModif'] : ''?>" style="display:<?php echo $type =='consultation' ? 'block': 'none'?>" class = "Consultation" id = "formConsultation">
                 <div class = "mainForm">
                     <div class = "formColumn" id = "firstColumn">
                         <div class = "formInput">

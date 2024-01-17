@@ -1,4 +1,5 @@
 <?php
+include 'getlinkpdo.php';
 
     /**********************************************
      * ADD PATIENT
@@ -7,7 +8,17 @@
      * - Prend le $_POST de la page ajout en argument
      **********************************************/
     function addPatient($PATIENT) {
-        include 'getlinkpdo.php';
+        global $linkpdo;
+
+        // Vérification si le patient existe déjà
+        $req = $linkpdo->prepare('SELECT *
+                                  FROM   patient
+                                  WHERE  numSecu = :numSecu;');
+
+        $req->execute(array(':numSecu' => $PATIENT["numSecu"]));
+        if ($req->rowCount() > 0) {
+            die("Numéro de sécurité déjà existant dans la base de données (Le patient existe déjà dans la base de données).<br>");
+        }
 
         // Variables
         $nom        = $PATIENT["nom"];
@@ -48,7 +59,18 @@
      * - Prend le $_POST de la page ajout en argument
      **********************************************/
     function addMedecin($MEDECIN) {
-        include 'getlinkpdo.php';
+        global $linkpdo;
+
+        // Vérification si le medecin existe déjà
+        $req = $linkpdo->prepare('SELECT * 
+                                  FROM   medecin 
+                                  WHERE  LOWER(nom)    = LOWER(:nom)  
+                                  AND    LOWER(prenom) = LOWER(:prenom);');
+
+        $req->execute(array(':nom' => $MEDECIN["nom"], ':prenom' => $MEDECIN["prenom"]));
+        if ($req->rowCount() > 0) {
+            die("Le médecin existe déjà dans la base de données.<br>");
+        }
         
         // Variables
         $nom        = $_POST["nom"];
@@ -74,7 +96,7 @@
      * - Renvoie un array avec toutes les données du patient
      **********************************************/
     function getPatient($id) {
-        include 'getlinkpdo.php';
+        global $linkpdo;
 
         $req = $linkpdo->prepare('SELECT *
                                   FROM   patient
@@ -105,7 +127,7 @@
      * - Renvoie un array avec toutes les données du médecin
      **********************************************/
     function getMedecin($id) {
-        include 'getlinkpdo.php';
+        global $linkpdo;
 
         $req = $linkpdo->prepare('SELECT *
                                   FROM   medecin
@@ -125,6 +147,59 @@
             return explode(", ", $medecin);                     // $medecin[3] = civilité
         }
 
+    }
+
+
+    /**********************************************
+     * UPDATE PATIENT
+     * Modifie un patient de la base de données
+     * 
+     * - Prend l'id et le $_POST de la page ajout en argument
+     **********************************************/
+    function updatePatient($id, $PATIENT) {
+        global $linkpdo;
+
+        // Variables
+        $nom        = $PATIENT["nom"];
+        $prenom     = $PATIENT["prenom"];
+        $civilite   = $PATIENT["civilite"];
+        $adresse1   = $PATIENT["adresse1"];
+        $adresse2   = $PATIENT["adresse2"];
+        $ville      = $PATIENT["ville"];
+        $codePostal = $PATIENT["codePostal"];
+        $villeN     = $PATIENT["villeN"];
+        $dateN      = $PATIENT["dateN"];
+        $numSecu    = $PATIENT["numSecu"];
+        $idMedecin  = $PATIENT["medecinTraitant"];
+
+        // Préparation
+        $req = $linkpdo->prepare('UPDATE patient 
+                                  SET nom            = :nom, 
+                                      prenom         = :prenom, 
+                                      civilite       = :civilite, 
+                                      adresse1       = :adresse1, 
+                                      adresse2       = :adresse2, 
+                                      ville          = :ville, 
+                                      codePostal     = :codePostal, 
+                                      villeNaissance = :villeN, 
+                                      dateNaissance  = :dateN, 
+                                      numSecu        = :numSecu, 
+                                      idMedecin      = :idMedecin
+                                  WHERE idPatient = :idPatient;');
+
+        // Requête
+        $req->execute(array('nom'        => $nom,
+                            'prenom'     => $prenom,
+                            'civilite'   => $civilite,
+                            'adresse1'   => $adresse1,
+                            'adresse2'   => $adresse2,
+                            'ville'      => $ville,
+                            'codePostal' => $codePostal,
+                            'villeN'     => $villeN,
+                            'dateN'      => $dateN,
+                            'numSecu'    => $numSecu,
+                            'idMedecin'  => $idMedecin,
+                            'idPatient'  => $id));
     }
 
 ?>
