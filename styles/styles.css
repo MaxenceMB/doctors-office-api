@@ -123,7 +123,7 @@ header form img {
 
 main {
 	padding: 35px 100px;
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(255, 255, 255, 0.5);
 	flex: 1;
 }
 
@@ -471,11 +471,12 @@ table tr:nth-child(even) {
 	left: 10px;
 	padding: 10px;
 	padding-left: 25px;
-	border-radius: 5px;
-	border: 2px solid;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom: 5px solid;
+	font-weight: bold;
 
-	animation: animatename 1s forwards;
-	animation-delay: 2s !important;
+	animation: up 0.4s forwards, down 0.4s 4s forwards;
 }
 #message p {
 	flex: 1;
@@ -497,9 +498,8 @@ table tr:nth-child(even) {
 }
 
 .messageError {
-	background: #9b2b2e;
-	color: #ff5c5c;
-	border-color: #ff5c5c;
+	background: #fde1de;
+	color: #ec412f;
 }
 .messageError::before {
 	content: "Erreur";
@@ -511,13 +511,12 @@ table tr:nth-child(even) {
 }
 
 .messageError button {
-	background-color: #9b2b2e;
+	background-color: #fde1de;
 }
 
 .messageSuccess {
-	background: #28a745;
-	color: lightgreen;
-	border-color: lightgreen;
+	background: #b9dfc6;
+	color: #0cab55;
 }
 .messageSuccess::before {
 	content: "Succès";
@@ -529,10 +528,19 @@ table tr:nth-child(even) {
 }
 
 .messageSuccess button {
-	background-color: #28a745;
+	background-color: #b9dfc6;
 }
 
-@keyframes animatename{
+@keyframes up{
+	0%{
+		transform: translateX(-700px);
+	}
+	100%{
+		transform: translateX(0px);
+	}
+}
+
+@keyframes down{
 	0%{
 		transform: translateY(0px);
 	}
