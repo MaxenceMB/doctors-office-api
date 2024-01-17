@@ -21,53 +21,7 @@
 
             <div id="stats">
 
-            <h3>Répartition des patients</h3>
-
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Tranche d'âge</th>
-                  <th>Nombre d'hommes</th>
-                  <th>Nombre de femmes</th>
-                </tr>
-               </thead>
-               <tbody>
-            <?php
-                $res = $linkpdo->prepare("SELECT
-    SUM(CASE WHEN TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) < 25 THEN 1 ELSE 0 END) AS moins_de_25_ans,
-    SUM(CASE WHEN TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) BETWEEN 25 AND 50 THEN 1 ELSE 0 END) AS entre_25_et_50_ans,
-    SUM(CASE WHEN TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) > 50 THEN 1 ELSE 0 END) AS plus_de_50_ans
-FROM patient
-GROUP BY civilite;");
-                $res->execute();
-
-                $homme = $res->fetch();
-                $femme = $res->fetch();
-            ?>
-
-                <tr>
-                    <td>Moins de 25 ans</td>
-                    <td><?php echo $homme[0] ?></td>
-                    <td><?php echo $femme[0] ?></td>
-                </tr>
-
-                <tr>
-                    <td>Entre 25 et 50 ans</td>
-                    <td><?php echo $homme[1] ?></td>
-                    <td><?php echo $femme[1] ?></td>
-                </tr>
-
-                <tr>
-                    <td>Plus de 50 ans</td>
-                    <td><?php echo $homme[2] ?></td>
-                    <td><?php echo $femme[2] ?></td>
-                </tr>
-
-
-                </tbody>
-            </table>
-
+            <div>
             <h3>Durée totales des consultations par médecins</h3>
 
             <table>
@@ -98,6 +52,58 @@ GROUP BY civilite;");
                 </tbody>
             </table>
 
+        </div>
+
+        
+            <div>
+
+                <h3>Répartition des patients</h3>
+
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tranche d'âge</th>
+                      <th>Nombre d'hommes</th>
+                      <th>Nombre de femmes</th>
+                    </tr>
+                   </thead>
+                   <tbody>
+                <?php
+                    $res = $linkpdo->prepare("SELECT
+        SUM(CASE WHEN TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) < 25 THEN 1 ELSE 0 END) AS moins_de_25_ans,
+        SUM(CASE WHEN TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) BETWEEN 25 AND 50 THEN 1 ELSE 0 END) AS entre_25_et_50_ans,
+        SUM(CASE WHEN TIMESTAMPDIFF(YEAR, dateNaissance, CURDATE()) > 50 THEN 1 ELSE 0 END) AS plus_de_50_ans
+    FROM patient
+    GROUP BY civilite;");
+                    $res->execute();
+
+                    $homme = $res->fetch();
+                    $femme = $res->fetch();
+                ?>
+
+                    <tr>
+                        <td>Moins de 25 ans</td>
+                        <td><?php echo $homme[0] ?></td>
+                        <td><?php echo $femme[0] ?></td>
+                    </tr>
+
+                    <tr>
+                        <td>Entre 25 et 50 ans</td>
+                        <td><?php echo $homme[1] ?></td>
+                        <td><?php echo $femme[1] ?></td>
+                    </tr>
+
+                    <tr>
+                        <td>Plus de 50 ans</td>
+                        <td><?php echo $homme[2] ?></td>
+                        <td><?php echo $femme[2] ?></td>
+                    </tr>
+
+
+                    </tbody>
+                </table>
+            </div>
             
 
             </div>

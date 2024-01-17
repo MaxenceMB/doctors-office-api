@@ -32,7 +32,9 @@ a {
 }
 
 /* a voir si garde (y'a plus de bouton, que des a et input[submit] */
-button {
+input, button {
+	border: none;
+	outline: none;
 	margin:0;
 	padding:0;
 	font-family: 'Fredoka', sans-serif;
@@ -345,24 +347,10 @@ h2 {
     transition: 0.15s;
 }
 
-#tabs button::before {
-	content: "";
-	width: 100%;
-	height: 5%;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-
-	transition: 0.3s;
-}
-
 #tabs button:hover { 
     margin-top: 10px;
 }
 
-#tabs button:hover:before {
-	background-color: var(--dark-blue);
-}
 
 #tabs #current {
 	margin-top: 15px;
@@ -371,4 +359,184 @@ h2 {
 
 #tabs #current:hover:before {
 	background-color: inherit;
+}
+
+
+
+
+
+input {
+  padding:8px;
+  background:rgba(52, 152, 219,0.8);
+  color:white;
+  border:1px solid rgba(52, 152, 219,1);
+  border-radius:3px;
+
+  transition:0.2s all linear;
+}
+
+input:hover {
+  background:rgba(41, 128, 185,1.0)
+}
+
+input:focus {
+  background-color:white;
+  color:rgba(52, 152, 219,0.8);
+}
+
+select {
+  background:rgba(52, 152, 219,1.0);
+  color:white;
+  border-radius:3px;
+  border:none;
+  padding:10px;
+  overflow-y: scroll;
+  /* Pour firefox */
+  scrollbar-color: white rgba(52, 152, 219,1);
+  scrollbar-width:thin;
+}
+
+
+/* Pour chrome, Safari, etc */
+select::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+select::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 5px;
+}
+select::-webkit-scrollbar-track {
+  background-color: rgba(52, 152, 219,1);
+}
+/*
+.research .flex-research select::-webkit-scrollbar-button {
+  background-color: #4d7fff;
+  border-radius: 5px;
+}
+*/
+
+
+select:hover {
+  background:rgba(41, 128, 185,1.0);
+}
+
+
+/* style de <table> */
+
+table {
+    margin: 0 auto;
+    border: 1px solid var(--blue);
+    color: white;
+}
+
+table th {
+    min-width: 150px;
+    border: 1px solid var(--blue);
+    padding: 10px;
+    background-color: var(--blue);
+}
+
+table a {
+    color: white;
+    text-decoration: underline;
+}
+
+table td {
+    border: 1px solid var(--blue);
+    padding: 10px;
+}
+
+
+
+table tr:nth-child(odd) {
+    background-color: var(--dark-blue);
+}
+
+table tr:nth-child(even) {
+    background-color: var(--very-dark-blue); 
+}
+
+
+
+#message {
+	z-index: 10000;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	position: fixed;
+	width: 40%;
+	bottom: 10px;
+	left: 10px;
+	padding: 10px;
+	padding-left: 25px;
+	border-radius: 5px;
+	border: 2px solid;
+
+	animation: animatename 1s forwards;
+	animation-delay: 2s !important;
+}
+#message p {
+	flex: 1;
+	margin: 0;
+}
+#message button {
+	width: 3rem;
+    height: 3rem;
+    background-repeat: no-repeat;
+    background-size: 55%;
+    background-position: center;
+}
+
+#message button {
+    background-image:url("../images/supprimer.png");
+}
+#message button:hover {
+    background-image: url("../images/supprimerHover.png");
+}
+
+.messageError {
+	background: #9b2b2e;
+	color: #ff5c5c;
+	border-color: #ff5c5c;
+}
+.messageError::before {
+	content: "Erreur";
+	background-color: white;
+	padding: 1%;
+	margin-right: 10px;
+	border-radius: 10px;
+	font-weight: bold;
+}
+
+.messageError button {
+	background-color: #9b2b2e;
+}
+
+.messageSuccess {
+	background: #28a745;
+	color: lightgreen;
+	border-color: lightgreen;
+}
+.messageSuccess::before {
+	content: "Succès";
+	background-color: white;
+	padding: 1%;
+	margin-right: 10px;
+	border-radius: 10px;
+	font-weight: bold;
+}
+
+.messageSuccess button {
+	background-color: #28a745;
+}
+
+@keyframes animatename{
+	0%{
+		transform: translateY(0px);
+	}
+	100%{
+		transform: translateY(100px);
+	}
 }

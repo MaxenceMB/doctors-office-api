@@ -1,5 +1,6 @@
 <?php
 
+
 	$LINK_PATIENT = '/doctors-office-website/affichage.php'; /* par defaut on a ça, meme si il y a tout le temps ?type=..., c'est fait la moitié du temps en js donc php comprend pas */
 	$LINK_MEDECIN = '/doctors-office-website/affichage.php?type=medecin';
 	$LINK_CONSULTATION = '/doctors-office-website/affichage.php?type=consultation';
@@ -11,7 +12,7 @@
 <header id="header">
 	<h3 id="header-title">
 		Cabinet médical de Mac-Sens et Haine-Zoo
-		<?php if (isset($_SESSION['username']) && $_SESSION['username'] == 'root' && $_SESSION['password'] == 'root') { ?>	
+		<?php if (isset($_SESSION['username']) && $_SESSION['username'] == 'root' && $_SESSION['password'] == 'iutinfo') { ?>	
 
 
 		<?php } ?>

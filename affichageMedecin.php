@@ -105,21 +105,11 @@
         // ----------------------------------------------------------------------------------------------
         $res = $linkpdo->prepare("SELECT * FROM medecin ORDER BY nom");
         $res->execute();
+        ?>
 
-        if (isset($_GET['medecinSuppr'])) {
-            if ($_GET['medecinSuppr'] == "error") {
-        ?>
-        <p class="nbResultat nbResultatRed">❌ Une erreur s'est produite lors de la suppression du médecin</p>
-        <?php 
-    } else {
-        ?>
-        <p class="nbResultat nbResultatGreen">✔️ Le médecin a bien été supprimé</p>
-        <?php 
-        }} else {
-        ?>
         <p class="nbResultat">Voici la liste des <?php echo $res->rowcount() ?> médecins du cabinet médical</p>
-    <?php } 
-} ?>
+    
+    <?php } ?>
 
 
     <!-- DANS LES 2 CAS -->

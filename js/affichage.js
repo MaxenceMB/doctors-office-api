@@ -81,8 +81,8 @@ function checkValidConsultation() {
 		medecinConsultationFilter.options[medecinConsultationFilter.selectedIndex].text === "Indifférent" &&
 		patientConsultationFilter.options[patientConsultationFilter.selectedIndex].text === "Indifférent"
 		) {
-			document.getElementsByClassName("nbResultat")[0].innerText = "❌ Merci de renseigner une recherche"
-			document.getElementsByClassName("nbResultat")[0].style.color = "red"
+			document.getElementsByClassName("nbResultat")[2].innerText = "❌ Merci de renseigner une recherche"
+			document.getElementsByClassName("nbResultat")[2].style.color = "red"
 			return false;
 	}
 

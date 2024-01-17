@@ -7,9 +7,9 @@ if (isset($_GET['idPatient']) && isset($_GET['idMedecin'])) {
     $res->execute(array('idPatient' => $_GET['idPatient'], 'idMedecin' => $_GET['idMedecin'], 'dateRDV' => $_GET['dateRDV'], 'heureRDV' => $_GET['heureRDV']));
 
     if ($res->rowcount() == 0) {
-        header("Location: affichage.php?type=consultation&consultationSuppr=error");
+        header("Location: affichage.php?type=consultation&message=medecinSupprError");
     } else {
-        header("Location: affichage.php?type=consultation&consultationSuppr=".$_GET['idPatient']);
+        header("Location: affichage.php?type=consultation&message=medecinSupprSuccess");
     }
 
 } elseif (isset($_GET['idPatient'])) {
@@ -22,9 +22,9 @@ if (isset($_GET['idPatient']) && isset($_GET['idMedecin'])) {
     $res->execute(array('idPatient' => $_GET['idPatient']));
 
     if ($res->rowcount() == 0) {
-        header("Location: affichage.php?type=patient&patientSuppr=error");
+        header("Location: affichage.php?type=patient&message=patientSupprError");
     } else {
-        header("Location: affichage.php?type=patient&patientSuppr=".$_GET['idPatient']);
+        header("Location: affichage.php?type=patient&message=patientSupprSuccess");
     }
 
 } elseif (isset($_GET['idMedecin'])) {
@@ -40,9 +40,9 @@ if (isset($_GET['idPatient']) && isset($_GET['idMedecin'])) {
     $res->execute(array('idMedecin' => $_GET['idMedecin']));
 
     if ($res->rowcount() == 0) {
-        header("Location: affichage.php?type=medecin&medecinSuppr=error");
+        header("Location: affichage.php?type=medecin&message=medecinSupprError");
     } else {
-        header("Location: affichage.php?type=medecin&medecinSuppr=".$_GET['idMedecin']);
+        header("Location: affichage.php?type=medecin&message=medecinSupprSuccess");
     }
 }
 
