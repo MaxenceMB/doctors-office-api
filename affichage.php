@@ -46,7 +46,6 @@ if (isset($_POST['rechercherConsultation'])) {
 <body>
     <?php include "header.php";?>
 
-
     <div id="suppression">
         <p>Voulez-vous vraiment supprimer cet objet ?</p>
         <div>
@@ -64,30 +63,8 @@ if (isset($_POST['rechercherConsultation'])) {
 
     <?php
 
-    function showMessage($type, $message) {
-        echo "<div id='message' class='$type'>         
-                <p>$message</p>
-                <button class='button-supprimer' onclick=\"document.getElementById('message').style.display = 'none'\"></button>
-            </div>";
-    }
+    include 'errorMessage.php';
 
-    if (isset($_GET['message'])) {
-        if ($_GET['message'] == "errorRecherche") {
-            showMessage("messageError", "Une erreur innatendue s'est produite lors de la recherche");
-        } else if ($_GET['message'] == "patientSupprError") {
-            showMessage("messageError", "Une erreur s'est produite lors de la suppression du patient");
-        } else if ($_GET['message'] == "patientSupprSuccess") {
-            showMessage("messageSuccess", "Le patient a bien été supprimé");
-        } else if ($_GET['message'] == "medecinSupprError") {
-            showMessage("messageError", "Une erreur s'est produite lors de la suppression du médecin");
-        } else if ($_GET['message'] == "medecinSupprSuccess") {
-            showMessage("messageSuccess", "Le médecin a bien été supprimé");
-        } else if ($_GET['message'] == "consultationSupprError") {
-            showMessage("messageError", "Une erreur s'est produite lors de la suppression de la consultation");
-        } else if ($_GET['message'] == "consultationSupprSuccess") {
-            showMessage("messageSuccess", "La consultation a bien été supprimée");
-        } 
-    }
     ?>
 
     <main>

@@ -7,7 +7,7 @@
 	$LINK_STATISTIQUES = '/doctors-office-website/statistiques.php';
 
 ?>
-<img id="background" src="images/background3.jpg">
+<img id="background" src="images/fond.png">
 
 <header id="header">
 	<h3 id="header-title">
