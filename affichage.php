@@ -1,5 +1,6 @@
 <?php include "session.php";?>
 <?php include 'getlinkpdo.php';?>
+<?php include 'gestionbd.php';?>
 <?php 
 if (!isset($_GET['type'])) {
     // on aurait pu rediriger vers affichage.php?type=patient mais ca coutait 2 requête pour le même affichage, on va juste gérer le type dans une variable
@@ -10,8 +11,28 @@ if (!isset($_GET['type'])) {
     // redirection si l'utilisateur entre manuellement (pas possible autrement) un type autre que médecin/patient
     header("Location: affichage.php?type=patient");
 }
-?>
 
+if (isset($_POST['rechercherPatient'])) {
+    if (!isset($_POST['searchinput']) || !isset($_POST["medecinTraitant"]) || !isset($_POST["toulouse"]) || !isset($_POST["civilite"])) {
+        header("Location: affichage.php?type=patient&message=errorRecherche");
+    }
+}
+
+if (isset($_POST['rechercherMedecin'])) {
+    if (!isset($_POST['searchinput']) || !isset($_POST["medecinTraitant"]) || !isset($_POST["civilite"])) {
+        header("Location: affichage.php?type=medecin&message=errorRecherche");
+    }
+}
+
+if (isset($_POST['rechercherConsultation'])) {
+    if (!isset($_POST['startDate']) || !isset($_POST["endDate"]) || !isset($_POST["startHours"]) || !isset($_POST["endHours"]) || !isset($_POST["startDuree"]) || !isset($_POST["endDuree"]) || !isset($_POST["medecinConsultation"]) || !isset($_POST["patientConsultation"])) {
+        header("Location: affichage.php?type=consultation&message=errorRecherche");
+    }
+}
+
+
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,11 +62,40 @@ if (!isset($_GET['type'])) {
         </div>
     </div>
 
+    <?php
+
+    function showMessage($type, $message) {
+        echo "<div id='message' class='$type'>         
+                <p>$message</p>
+                <button class='button-supprimer' onclick=\"document.getElementById('message').style.display = 'none'\"></button>
+            </div>";
+    }
+
+    if (isset($_GET['message'])) {
+        if ($_GET['message'] == "errorRecherche") {
+            showMessage("messageError", "Une erreur innatendue s'est produite lors de la recherche");
+        } else if ($_GET['message'] == "patientSupprError") {
+            showMessage("messageError", "Une erreur s'est produite lors de la suppression du patient");
+        } else if ($_GET['message'] == "patientSupprSuccess") {
+            showMessage("messageSuccess", "Le patient a bien été supprimé");
+        } else if ($_GET['message'] == "medecinSupprError") {
+            showMessage("messageError", "Une erreur s'est produite lors de la suppression du médecin");
+        } else if ($_GET['message'] == "medecinSupprSuccess") {
+            showMessage("messageSuccess", "Le médecin a bien été supprimé");
+        } else if ($_GET['message'] == "consultationSupprError") {
+            showMessage("messageError", "Une erreur s'est produite lors de la suppression de la consultation");
+        } else if ($_GET['message'] == "consultationSupprSuccess") {
+            showMessage("messageSuccess", "La consultation a bien été supprimée");
+        } 
+    }
+    ?>
+
     <main>
+        
         <!-- ----------------------------------------------------- -->
         <!-- PATIENT: AFFICHAGE DE LA NAVIGATION ACTUEL DE LA PAGE -->
         <!-- ----------------------------------------------------- -->
-        <section style="display:<?php echo $type=='patient' ? 'block': 'none'?>" class="Patient path">
+        <!--<section style="display:<?php echo $type=='patient' ? 'block': 'none'?>" class="Patient path">
             <a href="affichage.php?type=patient">Patient</a><span>></span><a href="affichage.php?type=patient">Liste</a>
             <?php if (isset($_POST['rechercherPatient'])) {
 
@@ -76,11 +126,11 @@ if (!isset($_GET['type'])) {
             <span>></span><a href="#">Patient<?php echo $phrase;?></a>
             
         <?php } ?>
-        </section>
+        </section>-->
         <!-- ----------------------------------------------------- -->
         <!-- MEDECIN: AFFICHAGE DE LA NAVIGATION ACTUEL DE LA PAGE -->
         <!-- ----------------------------------------------------- -->
-        <section style="display:<?php echo $type=='medecin' ? 'block': 'none'?>" class="Medecin path">
+        <!--<section style="display:<?php echo $type=='medecin' ? 'block': 'none'?>" class="Medecin path">
             <a href="affichage.php?type=medecin">Médecin</a><span>></span><a href="affichage.php?type=medecin">Liste</a>
 
 
@@ -117,11 +167,11 @@ if (!isset($_GET['type'])) {
             <span>></span><a href="#">Médecin<?php echo $phrase;?></a>
 
         <?php } ?>
-        </section>
+        </section>-->
         <!-- ----------------------------------------------------- -->
         <!-- CONSULTATION: AFFICHAGE DE LA NAVIGATION ACTUEL DE LA PAGE -->
         <!-- ----------------------------------------------------- -->
-        <section style="display:<?php echo $type=='consultation' ? 'block': 'none'?>" class="Consultation path">
+        <!--<section style="display:<?php echo $type=='consultation' ? 'block': 'none'?>" class="Consultation path">
             <a href="affichage.php?type=consultation">Consultation</a><span>></span><a href="affichage.php?type=consultation">Liste</a>
             <?php
 
@@ -176,6 +226,7 @@ if (!isset($_GET['type'])) {
             
         <?php } ?>
         </section>
+    -->
 
 
         <!-- ----------------------------------------------------- -->
@@ -204,6 +255,6 @@ if (!isset($_GET['type'])) {
     <?php include "footer.php";?>
 
     <script src="js/affichage.js"></script>
-    <script src="js/ajout.js"></script>
+    <script src="js/tabsystem.js"></script>
 </body>
 </html>

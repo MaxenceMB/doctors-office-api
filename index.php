@@ -1,11 +1,11 @@
 <?php 
 session_start();
 
-if (isset($_SESSION['username']) && $_SESSION['username'] == 'root' && $_SESSION['password'] == 'root') {
+if (isset($_SESSION['username']) && $_SESSION['username'] == 'root' && $_SESSION['password'] == 'iutinfo') {
 	header("Location: affichage.php"); // ou ./ mais pas sur si y'a 2 pages .php qui se suivent (i.php/p.php ca va revenir à i.php)
 }
 
-if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['password'] == "root") {
+if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['password'] == "iutinfo") {
 	$_SESSION['username'] = $_POST['username'];
 	$_SESSION['password'] = $_POST['password'];
 	header("Location: affichage.php?type=patient");
@@ -41,7 +41,7 @@ if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['passwo
 						Le nom d'utilisateur n'existe pas
 					</div>
 					<?php
-						} elseif ($_POST['password'] != "root") {
+						} elseif ($_POST['password'] != "iutinfo") {
 							?>
 					<div class="error">
 						Le mot de passe est invalide
@@ -56,7 +56,7 @@ if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['passwo
 					<div class="parts">
 						<label>Nom d'utilisateur</label>
 						<div class="input">
-							<input value="root" maxlength="150" required name="username" placeholder="username">
+							<input maxlength="150" required name="username" placeholder="username">
 							<button class="loginIcon" type="button">
 								<img src="images/compte.png">
 							</button>
@@ -69,7 +69,7 @@ if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['passwo
 						<label>Mot de passe</label>
 
 						<div class="input">
-							<input value="root" maxlength="100" required id="password" name="password" type="password" placeholder="motdepasse">
+							<input maxlength="100" required id="password" name="password" type="password" placeholder="motdepasse">
 							<button class="loginIcon" type="button" onclick="showPassword(this)">
 								<img src="images/oeilFerme.png">
 							</button>

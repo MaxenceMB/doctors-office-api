@@ -206,22 +206,11 @@
         $res = $linkpdo->prepare("SELECT * FROM consultation ORDER BY dateRDV desc, heureRDV desc");
         $res->execute();
 
-        if (isset($_GET['consultationSuppr'])) {
-            if ($_GET['consultationSuppr'] == "error") {
         ?>
-        <p class="nbResultat nbResultatRed">❌ Une erreur s'est produite lors de la suppression de la consultation</p>
-        <?php 
-            } else {
-        ?>
-        <p class="nbResultat nbResultatGreen">✔️ La consultation a bien été supprimée</p>
-        <?php 
-        }} else {
-        ?>
+        
         <p class="nbResultat">Voici la liste des <?php echo $res->rowcount() ?> consultations du cabinet médical</p>
-    <?php }
-    } ?>
-
-
+    
+    <?php } ?>
 
 
     <div id="createButton">

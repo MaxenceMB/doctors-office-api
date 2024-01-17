@@ -72,28 +72,33 @@
     // PATIENT: CAS 2 : On fait une recherche (POST) dans l'onglet patient
     // ----------------------------------------------------------------------------------------------
     if (isset($_POST['rechercherPatient'])) {
-        $recherche = explode(" ", $_POST['searchinput']);
+        try {
+            $where_requete = "";
+            $where_lst = array();
 
-        $where_requete = "";
-        $where_lst = array();
-        foreach ($recherche as $key => $value) {
-            $where_requete .= (($key == 0) ? " WHERE (" : " OR")." nom LIKE :keyword$key OR prenom LIKE :keyword$key OR civilite LIKE :keyword$key OR adresse1 LIKE :keyword$key OR adresse2 LIKE :keyword$key OR ville LIKE :keyword$key OR codePostal LIKE :keyword$key OR numSecu LIKE :keyword$key";
-            $where_lst["keyword$key"] = "%$value%";
-        }
-        $where_requete .= ")";
 
-        if ($_POST["medecinTraitant"] != "Indifférent") {
-            $where_requete .= " AND idMedecin = :idMedecin";
-            $where_lst["idMedecin"] = $_POST['medecinTraitant'];
-        }
+            $recherche = explode(" ", $_POST['searchinput']);
+            foreach ($recherche as $key => $value) {
+                $where_requete .= (($key == 0) ? " WHERE (" : " OR")." nom LIKE :keyword$key OR prenom LIKE :keyword$key OR civilite LIKE :keyword$key OR adresse1 LIKE :keyword$key OR adresse2 LIKE :keyword$key OR ville LIKE :keyword$key OR codePostal LIKE :keyword$key OR numSecu LIKE :keyword$key";
+                $where_lst["keyword$key"] = "%$value%";
+            }
+            $where_requete .= ")";
 
-        if ($_POST["toulouse"] != "Indifférent") {
-            $where_requete .= " AND lower(ville) = 'toulouse'";
-        }
+            if ($_POST["medecinTraitant"] != "Indifférent") {
+                $where_requete .= " AND idMedecin = :idMedecin";
+                $where_lst["idMedecin"] = $_POST['medecinTraitant'];
+            }
 
-        if ($_POST["civilite"] != "Indifférent") {
-            $where_requete .= " AND civilite = :civilite";
-            $where_lst["civilite"] = $_POST['civilite'];
+            if ($_POST["toulouse"] != "Indifférent") {
+                $where_requete .= " AND lower(ville) = 'toulouse'";
+            }
+
+            if ($_POST["civilite"] != "Indifférent") {
+                $where_requete .= " AND civilite = :civilite";
+                $where_lst["civilite"] = $_POST['civilite'];
+            }
+        } catch (Exception $e) {
+            die("test<br>");
         }
 
         
@@ -116,23 +121,11 @@
         // ----------------------------------------------------------------------------------------------
         $res = $linkpdo->prepare("SELECT * FROM patient ORDER BY nom");
         $res->execute();
+        ?>
 
-        if (isset($_GET['patientSuppr'])) {
-            if ($_GET['patientSuppr'] == "error") {
-        ?>
-        <p class="nbResultat nbResultatRed">❌ Une erreur s'est produite lors de la suppression du patient</p>
-        <?php 
-            } else {
-        ?>
-        <p class="nbResultat nbResultatGreen">✔️ Le patient a bien été supprimé</p>
-        <?php 
-        }} else {
-        ?>
         <p class="nbResultat">Voici la liste des <?php echo $res->rowcount() ?> patients du cabinet médical</p>
-    <?php }
-    } ?>
 
-
+    <?php } ?>
 
     <!-- DANS LES 2 CAS -->
         <div id="createButton">

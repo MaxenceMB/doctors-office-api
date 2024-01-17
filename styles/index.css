@@ -4,11 +4,6 @@ body {
 	background-size: cover;
 }
 
-input, button {
-	border: none;
-	outline: none;
-}
-
 .div-sign {
 	box-shadow: 0px 0px 20px 2px var(--dark-blue);
 	-moz-box-shadow: 0px 0px 20px 2px var(--dark-blue);
@@ -70,6 +65,7 @@ input, button {
 	padding:5%;
 	background:none;
 	color:inherit; /* inherit from div.input */
+	border:0;
 }
 
 .div-sign div.input input::placeholder {
