@@ -8,27 +8,28 @@
 }
 
 /*** TITRES ***/
-h2 {
-    width:   1005px;
+.tabHeader {
+    width:   70%;
     margin:  0 auto;
-    padding: 10px;
 
     background-color: var(--dark-blue);
     border-top-left-radius:     10px;
     border-top-right-radius:    10px;
-    border-bottom: 3px solid var(--blue);
 
     color: white;
+}
+
+h2 {
+    border-bottom: 3px solid var(--blue);
 }
 
 
 /*** MAIN FORM ***/
 /* tabs */
 #tabs {
-    width:   1005px;
+    width:   69%;
     height:  60px;
     margin:  0 auto;
-    padding: 0 10px;
     
     display: flex;
 }
@@ -58,8 +59,8 @@ h2 {
 }
 
 form#formPatient, form#formMedecin, form#formConsultation {
-    margin:   0 auto;
-    width:    1025px;
+    margin:  0 auto;
+    width:   70%;
 
     color: var(--secondary-color);
 
@@ -70,180 +71,99 @@ form#formPatient, form#formMedecin, form#formConsultation {
 }
 
 
+
 /* Partie principale (sans les boutons) */
 .mainForm {
     display: flex;
-    justify-content: center;
-    padding: 15px 0;
+    justify-content: space-around;
+    padding: 15px 10px;
 }
 
-
-/* La zone finale du formulaire avec les deux boutons */
-.formButtons {
-    display: flex;
-    padding: 15px;
-
-    background-color: var(--blue);
-    border-bottom-left-radius:  10px;
-    border-bottom-right-radius: 10px;
+.mainForm > * {
+    flex: 1;
 }
-
-.formButtons .ma {
-    margin: 0 5px;
-}
-
 
 /* Les deux colonnes du formulaire */
 .formColumn {
     display: flex;
     flex-direction: column;
 
-    padding: 15px;
+    padding: 0 15px;
+}
+
+
+/* La zone finale du formulaire avec les deux boutons */
+.formButtons {
+    display: flex;
+    height: auto;
+    padding: 10px;
+
+    background-color: var(--blue);
+    border-bottom-left-radius:  10px;
+    border-bottom-right-radius: 10px;
+}
+
+.formButtons .btna {
+    margin: 5px 5px;
+}
+
+.formButtons > input[type="submit"], .formButtons > input[type="reset"] {
+    height: inherit;
 }
 
 
 /* Petits titres */
 .formHeader {
     width:  100%;
-    margin-bottom: 0;
+    height: 40px;
+
     font-size: 22px;
     font-weight: bold;
 
     border-bottom: white solid 1px;
 }
 
-
-/* PATIENTS */
-/* Chaque input avec son label */
-.Patient .formInput {
+.formDouble {
     display: flex;
-    align-items: center;
-
-    height: 50px;
-}
-
-
-/* La zone à deux inputs */
-.Patient .formDoubleInput {
-    display: flex;
+    flex-direction: row;
     justify-content: space-between;
 }
 
-
-/* Les labels des inputs */
-.Patient .formLabel {
-    width:  175px;
-    font-size: 18px;
-    font-weight: bold;
-
-    display: flex;
-    align-items: center;
+.longDouble {
     flex: 1 0 25%;
 }
 
-/* Le deuxième label des zone à deux inputs */
-.Patient .formSecondLabel {
-    width: auto;
-    margin-right: 15px;
+.shortDouble {
+    flex: 1;
+}
+
+/* Chaque input avec son label */
+.formInput {
+    display: flex;
+    align-items: left;
+    flex-direction: column;
+    justify-content: space-around;
+
+    margin: 5px 5px;
+    height: 70px;
+}
+
+/* Les labels des inputs */
+.formLabel {
+    font-size: 18px;
+    font-weight: bold;
 }
 
 
 /* Tous les inputs textuels */
-.Patient input[type = text] {
+.mainForm input {
     border:           none;
     border-bottom:    2px solid darkblue;
     border-radius:    3px;
     background-color: #EEEEEE;
 
-    height: 25px;
-}
-
-/* Les inputs "court" */
-.Patient .shortInput {
-    width: 15em;
-}
-
-/* Les inputs "long" */
-.Patient .longInput {
-    width: 30em;
-}
-
-/* L'input du code postal */
-#codePostal {
-    width: 4em;
-}
-
-
-/* MEDECINS */
-.Medecin {
-    display: none;
-}
-
-
-/* Les inputs de medecins */
-.Medecin .formInput {
-    width: 250px;
-}
-
-/* inputs textuels */
-.Medecin input[type = text] {
-    border:           none;
-    border-bottom:    2px solid darkblue;
-    border-radius:    3px;
-    background-color: #EEEEEE;
+    color: black;
+    font-size: 15px;
 
     height: 25px;
-}
-
-/* Les labels des inputs */
-.Medecin .formLabel {
-    font-size: 18px;
-    font-weight: bold;
-
-    display: flex;
-    align-items: center;
-    flex: 1 0 25%;
-}
-
-
-/* Les inputs "court" */
-.Medecin .shortInput {
-    width: 15em;
-}
-
-/* CONSULTATION */
-/* Les inputs de Consultation */
-.Consultation .formInput {
-    display: flex;
-    align-items: center;
-
-    height: 50px;
-}
-
-/* La zone à deux inputs */
-.Consultation .formDoubleInput {
-    display: flex;
-    justify-content: space-between;
-}
-
-
-/* Les labels des inputs */
-.Consultation .formLabel {
-    width:  125px;
-    font-size: 18px;
-    font-weight: bold;
-
-    display: flex;
-    align-items: center;
-    flex: 1 0 25%;
-}
-
-.Consultation #firstColumn {
-    width: 800px;
-}
-
-/* Le deuxième label des zone à deux inputs */
-.Consultation .formSecondLabel {
-    width: auto;
-    margin-right: 15px;
 }
