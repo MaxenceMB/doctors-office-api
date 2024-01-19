@@ -1,3 +1,15 @@
+function supprimerParametreMessageDeURL() {
+    var url = window.location.href;
+
+    if (url.indexOf('message=') !== -1) {
+        var nouveauURL = url.replace(/([?&])message=[^&]+(&|$)/, '$1');
+        
+        window.history.replaceState({}, document.title, nouveauURL);
+    }
+}
+
+supprimerParametreMessageDeURL();
+
 function showTab(nom) {
     window.history.replaceState({}, document.title, window.location.pathname + '?type='+nom.toLowerCase());
     current = document.getElementById("current")

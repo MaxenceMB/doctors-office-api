@@ -19,7 +19,7 @@ if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['passwo
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="styles/styles.css">
 	<link rel="stylesheet" type="text/css" href="styles/index.css">
-	<title>ddd</title>
+	<title>Connexion au cabinet</title>
 </head>
 <body>
 
@@ -57,25 +57,20 @@ if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['passwo
 						<label>Nom d'utilisateur</label>
 						<div class="input">
 							<input maxlength="150" required name="username" placeholder="username">
-							<button class="loginIcon" type="button">
+							<button disabled class="loginIcon" type="button">
 								<img src="images/compte.png">
 							</button>
 						</div>
-
-						<!--<span class="is_valid">{{ username_is_valid }}</span>-->
 					</div>
 
 					<div class="parts">
 						<label>Mot de passe</label>
-
 						<div class="input">
 							<input maxlength="100" required id="password" name="password" type="password" placeholder="motdepasse">
 							<button class="loginIcon" type="button" onclick="showPassword(this)">
 								<img src="images/oeilFerme.png">
 							</button>
 						</div>
-						
-						<!--<span class="is_valid">{{ password_is_valid }}<span> -->
 					</div>
 				</div>
 

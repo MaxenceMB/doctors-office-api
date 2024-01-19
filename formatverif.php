@@ -315,4 +315,38 @@
                (estLibre("patient", $CONSULTATION));
     }
 
+
+
+    function checkDateConsultationRecherche($dateN) {
+        $result = "";
+        //echo "LEN".strlen($dateN)."LEN";
+        //echo "<br>SIU".$dateN."SIU";
+                                                                                                                                                //////////////////////////
+        if (strlen($dateN) == 0) {
+            return "";
+        }
+        if(strlen($dateN) != 10) { $result .= "La taille de la date est invalide.<br>"; }                                                       // Taille invalide      //
+        if(preg_match('/[^0-9-]+/', $dateN, $matches)) { $result .= "Le date contient des charactères interdits.<br>"; }                        // Caractères spéciaux  //
+        if($dateN > "2030-01-01") { $result .= "La date est supérieure à la date maximum.<br>"; }                                              // Date trop élevée     //
+        if($dateN < "2023-01-01") { $result .= "La date est inférieure a la date minimum.<br>"; }                                               // Date trop ancienne   //
+                                                                                                                                                //////////////////////////
+
+        return $result;
+    }
+
+    function checkHeureConsultationRecherche($heureN) {
+        $result = "";
+
+        if (strlen($heureN) == 0) {
+            return "";
+        }
+                                                                                                                                                //////////////////////////
+        if(strlen($heureN) != 5) { $result .= "La taille de l'heure est invalide.<br>"; }                                                       // Taille invalide      //
+        if(preg_match('/[^0-9:]+/', $heureN, $matches)) { $result .= "L'heure contient des charactères interdits.<br>"; }                        // Caractères spéciaux  //
+        if($heureN > "20:00") { $result .= "L'heure est supérieure à la date maximum.<br>"; }                                              // Date trop élevée     //
+        if($heureN < "08:00") { $result .= "L'heure est inférieure a la date minimum.<br>"; }                                               // Date trop ancienne   //
+                                                                                                                                                //////////////////////////
+        return $result;
+    }
+
 ?>

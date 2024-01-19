@@ -14,12 +14,12 @@ $correspondanceMessage = [
     "medecinSupprSuccess" => ["messageSuccess", "Le médecin a bien été supprimé"],
     "consultationSupprError" => ["messageError", "Une erreur s'est produite lors de la suppression de la consultation"],
     "consultationSupprSuccess" => ["messageSuccess", "La consultation a bien été supprimée"],
-    "a" => ["messageError", "Le nom est vide"],
-    "b" => ["messageError", "Le nom ne peut pas dépasser 20 caractères"],
-    "c" => ["messageError", "Le nom contient des charactères interdits."],
-    "d" => ["messageError", "Le prénom est vide"],
-    "e" => ["messageError", "Le prénom ne peut pas dépasser 20 caractères"],
-    "f" => ["messageError", "Le prénom contient des charactères interdits."],
+    "NOM_VIDE" => ["messageError", "Le nom est vide"],
+    "NOM_LONG" => ["messageError", "Le nom ne peut pas dépasser 20 caractères"],
+    "NOM_SPE" => ["messageError", "Le nom contient des charactères interdits."],
+    "PRENOM_VIDE" => ["messageError", "Le prénom est vide"],
+    "PRENOM_LONG" => ["messageError", "Le prénom ne peut pas dépasser 20 caractères"],
+    "PRENOM_SPE" => ["messageError", "Le prénom contient des charactères interdits."],
 ];
 
 if (isset($_GET['message'])) {
@@ -28,4 +28,4 @@ if (isset($_GET['message'])) {
         showMessage($correspondance[0], $correspondance[1]);
     }
 }
-?>
+?>  

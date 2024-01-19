@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Affichage</title>
+    <title>Statistiques du cabinet</title>
     <link rel="stylesheet" type="text/css" href="styles/styles.css">
     <link rel="stylesheet" type="text/css" href="styles/affichage.css">
     <link rel="stylesheet" type="text/css" href="styles/statistiques.css">

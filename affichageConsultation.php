@@ -9,12 +9,12 @@
         <div class="flex-research">
             <div>
                 <label for="startDate">Depuis le</label>
-                <input type="date" id="startDate" name="startDate" min="2018-01-01" max="2030-12-31" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['startDate'] : '' ?>"/>
+                <input type="date" id="startDate" name="startDate" min="2023-01-01" max="2030-01-01" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['startDate'] : '' ?>"/>
             </div>
 
             <div>
                 <label for="endDate">Jusqu'au</label>
-                <input type="date" id="endDate" name="endDate" min="2018-01-01" max="2030-12-31" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['endDate'] : '' ?>"/>
+                <input type="date" id="endDate" name="endDate" min="2023-01-01" max="2030-01-01" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['endDate'] : '' ?>"/>
             </div>
 
             <div>
@@ -24,7 +24,7 @@
 
             <div>
                 <label for="endHours">À</label>
-                <input type="time" id="endHours" name="endHours" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['endHours'] : '' ?>"/>
+                <input type="time" id="endHours" name="endHours" min="08:00" max="20:00" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['endHours'] : '' ?>"/>
             </div>
 
             <div>

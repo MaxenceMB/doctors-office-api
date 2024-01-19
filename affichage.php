@@ -1,6 +1,7 @@
 <?php include "session.php";?>
 <?php include 'getlinkpdo.php';?>
 <?php include 'gestionbd.php';?>
+<?php include 'formatverif.php';?>
 <?php 
 if (!isset($_GET['type'])) {
     // on aurait pu rediriger vers affichage.php?type=patient mais ca coutait 2 requête pour le même affichage, on va juste gérer le type dans une variable
@@ -25,7 +26,7 @@ if (isset($_POST['rechercherMedecin'])) {
 }
 
 if (isset($_POST['rechercherConsultation'])) {
-    if (!isset($_POST['startDate']) || !isset($_POST["endDate"]) || !isset($_POST["startHours"]) || !isset($_POST["endHours"]) || !isset($_POST["startDuree"]) || !isset($_POST["endDuree"]) || !isset($_POST["medecinConsultation"]) || !isset($_POST["patientConsultation"])) {
+    if (!isset($_POST['startDate']) || !isset($_POST["endDate"]) || !isset($_POST["startHours"]) || !isset($_POST["endHours"]) || !isset($_POST["startDuree"]) || !isset($_POST["endDuree"]) || !isset($_POST["medecinConsultation"]) || !isset($_POST["patientConsultation"]) || checkDateConsultationRecherche($_POST['startDate']) != "" || checkDateConsultationRecherche($_POST['endDate']) != "" || checkHeureConsultationRecherche($_POST['startHours']) != "" || checkHeureConsultationRecherche($_POST['endHours']) != "") {
         header("Location: affichage.php?type=consultation&message=errorRecherche");
     }
 }
@@ -45,6 +46,7 @@ if (isset($_POST['rechercherConsultation'])) {
 
 <body>
     <?php include "header.php";?>
+
 
     <div id="suppression">
         <p>Voulez-vous vraiment supprimer cet objet ?</p>

@@ -145,7 +145,7 @@
                                     $resMedecinString->execute();
 
                                     while ($data = $resMedecinString->fetch()) {
-                                        $string = $data[2].". ".$data[0]." ".$data[1];
+                                        $string = $data[2]." ".$data[0]." ".$data[1];
                                         $idMedecinT = $data[3]; ?>
                                         <option value = "<?php echo $idMedecinT?>" <?php echo ($type == "patient" && $champs['medecinTraitantP'] == $data[3]) ? "selected" : "" ?>> <?php echo $string; ?> </option>
                                     <?php } ?>
@@ -199,7 +199,7 @@
                 <div class = "formButtons">
                     <input type = "reset"   name = "reset"          class="btna red">
                     <input type = "submit"  name = "validerPatient" class="btna green">
-                </div>      
+                </div>    
             </form>
 
             <!-- Formulaire principal d'ajout d'un Medecin -->
@@ -244,16 +244,11 @@
                             <select name = "patientC" id = "patientC">
                                 <option>Aucun</option>
                                 <?php
-                                    try {
-                                        $linkpdopdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
-                                    } catch (Exception $e) {
-                                        die('Erreur : ' . $e->getMessage());
-                                    }
-                                    $resMedecinString = $linkpdopdo->prepare("SELECT nom, prenom, civilite, idPatient, idMedecin FROM patient ORDER BY nom");
+                                    $resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite, idPatient, idMedecin FROM patient ORDER BY nom");
                                     $resMedecinString->execute();
 
                                     while ($data = $resMedecinString->fetch()) {
-                                        $string = $data[2].". ".$data[0]." ".$data[1];
+                                        $string = $data[2]." ".$data[0]." ".$data[1];
                                         $idPatientC = $data[3];
                                         $idMedecinT = $data[4];
                                 ?>
@@ -272,16 +267,11 @@
                             <select name = "medecinC" id = "medecinC">
                                 <option>Aucun</option>
                                 <?php
-                                    try {
-                                        $linkpdopdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
-                                    } catch (Exception $e) {
-                                        die('Erreur : ' . $e->getMessage());
-                                    }
-                                    $resMedecinString = $linkpdopdo->prepare("SELECT nom, prenom, civilite, idMedecin FROM medecin ORDER BY nom");
+                                    $resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite, idMedecin FROM medecin ORDER BY nom");
                                     $resMedecinString->execute();
 
                                     while ($data = $resMedecinString->fetch()) {
-                                        $string = $data[2].". ".$data[0]." ".$data[1];
+                                        $string = $data[2]." ".$data[0]." ".$data[1];
                                         $idMedecin = $data[3];
                                 ?>
                                 <option value="<?php echo $idMedecin?>"> <?php echo $string; ?> </option>
