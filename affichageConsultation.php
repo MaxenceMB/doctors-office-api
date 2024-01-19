@@ -256,7 +256,7 @@
             <td><a href="affichage.php?type=medecin&id=<?php echo $data['idMedecin']; ?>"><?php echo $medecinString ?></a></td>
             <td><?php echo $patientString ?></td>
             <td>
-                <button class="btna bluenoshadow inside-button-modifier"></button>
+                <a href = "ajout.php?type=consultation&idModif=<?php echo $data['idPatient'].'|'.$data['dateRDV'].'|'.$data['heureRDV']?>"><button class="btna bluenoshadow inside-button-modifier"></button></a>
                 <button onclick="deleteConsultation(this)" data-patient-id="<?php echo $data['idPatient']; ?>" data-medecin-id="<?php echo $data['idMedecin']; ?>" data-daterdv="<?php echo $data['dateRDV']; ?>" data-heurerdv="<?php echo $data['heureRDV']; ?>" class="btna rednoshadow inside-button-supprimer"></button>
             </td>
         </tr>

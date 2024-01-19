@@ -126,7 +126,7 @@
      * - Prend la variable à vérifier (l'id) en argument.
      * - Renvoie un string vide si tout va bien, code d'erreur sinon.
      **********************************************/
-    function checkId($id, $table) {
+    function checkId($id, $table, $nullable) {
         include 'getlinkpdo.php';
 
         if($table == "patient") {
@@ -141,8 +141,11 @@
             return "Err interne: Table invalide dans checkId()";
         }
 
+        $aucun = ($id != -1);
+        $aucunNonAutorise = !($aucun || ($aucun || $nullable));
+
         $req->execute(array(':id'  => $id));                                                             //////////////////////////
-        if ($req->rowCount() == 0 && $id != -1) {                                                        // Introuvable & pas -1 //
+        if ($req->rowCount() == 0 && $aucunNonAutorise) {                                                // Introuvable & pas -1 //
             return strtoupper(substr($table, 0, 3))."_INV";                                              //////////////////////////
         }
 
@@ -198,7 +201,7 @@
         include 'getlinkpdo.php';
 
         if($qui == "patient") {
-            $req = $linkpdo->prepare('SELECT COUNT(*) 
+            $req = $linkpdo->prepare('SELECT *
                                       FROM  consultation
                                       WHERE idPatient = :idPatient
                                       AND   dateRDV = :datec
@@ -216,7 +219,7 @@
                                 ':duree'      => $CONSULTATION['dureeC']));     
 
         } else if($qui == "medecin") {
-            $req = $linkpdo->prepare('SELECT COUNT(*) 
+            $req = $linkpdo->prepare('SELECT *
                                       FROM  consultation
                                       WHERE idMedecin = :idMedecin
                                       AND   dateRDV = :datec
@@ -260,17 +263,17 @@
      * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon.
      **********************************************/
     function checkPatient($PATIENT) {
-        return ((isset($PATIENT["civiliteP"]))        ? checkCivilite($PATIENT["civiliteP"])              : "CIV_INV"    ) ?:
-               ((isset($PATIENT["nomP"]))             ? checkNom($PATIENT["nomP"], "nom")                 : "NOM_INV"    ) ?:
-               ((isset($PATIENT["prenomP"]))          ? checkNom($PATIENT["prenomP"], "prenom")           : "PRENOM_INV" ) ?:
-               ((isset($PATIENT["numSecuP"]))         ? checkSecurite($PATIENT["numSecuP"])               : "SECU_INV"   ) ?:
-               ((isset($PATIENT["medecinTraitantP"])) ? checkId($PATIENT["medecinTraitantP"], "medecin")  : ""           ) ?:
-               ((isset($PATIENT["adresse1P"]))        ? checkAdresse($PATIENT["adresse1P"], true)         : "ADR_INV"    ) ?:
-               ((isset($PATIENT["adresse2P"]))        ? checkAdresse($PATIENT["adresse2P"], false)        : ""           ) ?:
-               ((isset($PATIENT["villeP"]))           ? checkVille($PATIENT["villeP"], "ville")           : "VILLE_INV"  ) ?:
-               ((isset($PATIENT["codePostalP"]))      ? checkCodePostal($PATIENT["codePostalP"])          : "CP_INV"     ) ?:
-               ((isset($PATIENT["villeNP"]))          ? checkVille($PATIENT["villeNP"], "villen")         : "VILLEN_INV" ) ?:
-               ((isset($PATIENT["dateNP"]))           ? checkDateNaissance($PATIENT["dateNP"])            : "DATEN_INV"  );
+        return ((isset($PATIENT["civiliteP"]))        ? checkCivilite($PATIENT["civiliteP"])                    : "CIV_INV"    ) ?:
+               ((isset($PATIENT["nomP"]))             ? checkNom($PATIENT["nomP"], "nom")                       : "NOM_INV"    ) ?:
+               ((isset($PATIENT["prenomP"]))          ? checkNom($PATIENT["prenomP"], "prenom")                 : "PRENOM_INV" ) ?:
+               ((isset($PATIENT["numSecuP"]))         ? checkSecurite($PATIENT["numSecuP"])                     : "SECU_INV"   ) ?:
+               ((isset($PATIENT["medecinTraitantP"])) ? checkId($PATIENT["medecinTraitantP"], "medecin", true)  : ""           ) ?:
+               ((isset($PATIENT["adresse1P"]))        ? checkAdresse($PATIENT["adresse1P"], true)               : "ADR_INV"    ) ?:
+               ((isset($PATIENT["adresse2P"]))        ? checkAdresse($PATIENT["adresse2P"], false)              : ""           ) ?:
+               ((isset($PATIENT["villeP"]))           ? checkVille($PATIENT["villeP"], "ville")                 : "VILLE_INV"  ) ?:
+               ((isset($PATIENT["codePostalP"]))      ? checkCodePostal($PATIENT["codePostalP"])                : "CP_INV"     ) ?:
+               ((isset($PATIENT["villeNP"]))          ? checkVille($PATIENT["villeNP"], "villen")               : "VILLEN_INV" ) ?:
+               ((isset($PATIENT["dateNP"]))           ? checkDateNaissance($PATIENT["dateNP"])                  : "DATEN_INV"  );
     }
 
 
@@ -306,13 +309,13 @@
      * - Renvoie un string vide si tout va bien, un code d'erreur sinon.
      **********************************************/
     function checkConsultation($CONSULTATION) {
-        return ((isset($CONSULTATION["patientC"])) ? checkId($CONSULTATION["patientC"], "patient") : "PAT_INV") ?:
-               ((isset($CONSULTATION["medecinC"])) ? checkId($CONSULTATION["medecinC"], "medecin") : "MED_INV") ?:
+        return ((isset($CONSULTATION["patientC"])) ? checkId($CONSULTATION["patientC"], "patient", false) : "PAT_INV") ?:
+               ((isset($CONSULTATION["medecinC"])) ? checkId($CONSULTATION["medecinC"], "medecin", false) : "MED_INV") ?:
                ((isset($CONSULTATION["dateC"]))    ? checkDateConsultation($CONSULTATION["dateC"]) : "DAT_INV") ?:
                ((isset($CONSULTATION["heureC"]) && isset($CONSULTATION["dureeC"])) ? checkHeure($CONSULTATION["heureC"], $CONSULTATION["dureeC"]) : "HR_INV" ) ?:
 
-               (estLibre("medecin", $CONSULTATION)) ?:
-               (estLibre("patient", $CONSULTATION));
+               (estLibre("patient", $CONSULTATION)) ?:
+               (estLibre("medecin", $CONSULTATION));
     }
 
 ?>

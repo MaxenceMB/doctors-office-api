@@ -16,9 +16,9 @@ include 'getlinkpdo.php';
         // Vérification si le patient existe déjà
         $req = $linkpdo->prepare('SELECT *
                                   FROM   patient
-                                  WHERE  numSecu = :numSecu;');
+                                  WHERE  numSecu = :numSecuP;');
 
-        $req->execute(array(':numSecu' => $PATIENT["numSecu"]));
+        $req->execute(array(':numSecuP' => $PATIENT["numSecuP"]));
         if ($req->rowCount() > 0) {
             die("Numéro de sécurité déjà existant dans la base de données (Le patient existe déjà dans la base de données).<br>");
         }
@@ -299,11 +299,11 @@ include 'getlinkpdo.php';
         $medecin = $CONSULTATION["medecinC"];
         $datec   = $CONSULTATION["dateC"];
         $heure   = $CONSULTATION["heureC"];
-        $duree   = $CONSULTATION["dureeC"];
+        $duree   = intval(substr($CONSULTATION["dureeC"], 0, 2)) * 60 + intval(substr($CONSULTATION["dureeC"], 3, 2));
 
         // Préparation
         $req = $linkpdo->prepare('INSERT INTO consultation(idPatient, dateRDV, heureRDV, duree, idMedecin)
-                                  VALUES(:patient, :datec, :heure, :duree, :medecin)');
+                                  VALUES(:patient, :datec, :heure, :duree, :idMedecin)');
 
         // Requête
         $req->execute(array('patient'    => $patient,
@@ -325,20 +325,21 @@ include 'getlinkpdo.php';
         global $linkpdo;
         $consultation = getConsultationVide();
 
-        $patient = $id["patientc"];
-        $dateC   = $id["datec"];
-        $heure   = $id["heurec"];
+        $patient = $id[0];
+        $dateC   = $id[1];
+        $heure   = substr($id[2], 0, 5);
 
-        $req = $linkpdo->prepare('SELECT idPatient, dateRDV, heureRDB, duree, idMedecin 
+        $req = $linkpdo->prepare('SELECT idPatient, idMedecin, dateRDV, heureRDV, duree 
                                   FROM   consultation 
-                                  WHERE  idPatient   = :patient, 
-                                         dateRDV     = :datec, 
-                                         heureRDV    = :heure;');
+                                  WHERE  idPatient   = :patient 
+                                  AND    dateRDV     = :datec 
+                                  AND    heureRDV    = :heure;');
 
 
-        $req->execute(array('idPatient'  => $patient,
-                            'datec'      => $datec,
-                            'heure'      => $heure,));
+        $req->execute(array('patient'  => $patient,
+                            'datec'    => $dateC,
+                            'heure'    => $heure));
+
         if ($req->rowCount() == 0 && $req->rowCount() > 1) {
             die("Erreur requête médecin.<br>");
         } else {
@@ -346,10 +347,12 @@ include 'getlinkpdo.php';
             $i = 0;
 
             foreach(array_keys($consultation) as &$key) {   // Return un array comprenant:
-                $medecin[$key] = $data[$i];                    
-                $i++;                                       // $medecin[0] = civilite
-            }                                               // $medecin[1] = nom      
-                                                            // $medecin[2] = prenom
+                $consultation[$key] = $data[$i];                    
+                $i++;                                       // $consultation[0] =
+            }                                               // $consultation[1] =    
+                                                            // $consultation[2] = 
+
+            $consultation['dureeC'] = sprintf("%02d:%02d", intdiv($consultation['dureeC'], 60), $consultation['dureeC']%60);
             return $consultation;                     
         }
 

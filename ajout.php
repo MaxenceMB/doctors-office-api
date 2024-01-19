@@ -16,7 +16,7 @@
 <html>
     <head>
         <meta charset = "utf-8" />
-        <title>Ajout patient</title>
+        <title>Ajout</title>
         <link rel = "stylesheet" href = "styles/styles.css">
         <link rel = "stylesheet" href = "styles/ajout.css">
     </head>
@@ -43,7 +43,13 @@
                         break;
 
                     case 'consultation':
-                        $champs = (isset($_GET['idModif'])) ? getConsultation($_GET['idModif']) : getConsultationVide();
+                        if(isset($_GET['idModif'])) {
+                            $idConsultation = explode('|', $_GET['idModif']);
+                            $champs = getConsultation($idConsultation);
+                            echo implode(', ', $champs);
+                        } else {
+                            $champs = getConsultationVide();
+                        }
                         break;
                 }
 
@@ -92,18 +98,16 @@
                         }
                     }
                 }
-
-                echo implode(', ', $champs);
             ?>
 
             <div id = "tabs">
-                <button class = "tablinks" onclick = "showTab('Patient')"      <?php echo $type == 'patient'      ? 'id = current': ''?>>Patient</button>
-                <button class = "tablinks" onclick = "showTab('Medecin')"      <?php echo $type == 'medecin'      ? 'id = current': ''?>>Medecin</button>
-                <button class = "tablinks" onclick = "showTab('Consultation')" <?php echo $type == 'consultation' ? 'id = current': ''?>>Consultation</button>
+                <button class = "tablinks" onclick = "showTab('Patient')"      <?php echo $type == 'patient'      ? 'id = current': ''?> style = "display:<?php echo isset($_GET['idModif']) ? 'none' : 'block'; ?>">Patient</button>
+                <button class = "tablinks" onclick = "showTab('Medecin')"      <?php echo $type == 'medecin'      ? 'id = current': ''?> style = "display:<?php echo isset($_GET['idModif']) ? 'none' : 'block'; ?>">Medecin</button>
+                <button class = "tablinks" onclick = "showTab('Consultation')" <?php echo $type == 'consultation' ? 'id = current': ''?> style = "display:<?php echo isset($_GET['idModif']) ? 'none' : 'block'; ?>">Consultation</button>
             </div>
-            <div class = "tabHeader"> <h2 style = "display:<?php echo $type == 'patient'      ? 'block': 'none'?>" class = "Patient"     >Nouveau patient</h2> </div>
-            <div class = "tabHeader"> <h2 style = "display:<?php echo $type == 'medecin'      ? 'block': 'none'?>" class = "Medecin"     >Nouveau medecin</h2> </div>
-            <div class = "tabHeader"> <h2 style = "display:<?php echo $type == 'consultation' ? 'block': 'none'?>" class = "Consultation">Nouvelle consultation</h2> </div>
+            <div class = "tabHeader"> <h2 style = "display:<?php echo $type == 'patient'      ? 'block': 'none'?>" class = "Patient"     ><?php echo isset($_GET['idModif']) ? "Modification " : "Nouveau "; ?>patient</h2> </div>
+            <div class = "tabHeader"> <h2 style = "display:<?php echo $type == 'medecin'      ? 'block': 'none'?>" class = "Medecin"     ><?php echo isset($_GET['idModif']) ? "Modification " : "Nouveau "; ?>medecin</h2> </div>
+            <div class = "tabHeader"> <h2 style = "display:<?php echo $type == 'consultation' ? 'block': 'none'?>" class = "Consultation"><?php echo isset($_GET['idModif']) ? "Modification " : "Nouveau "; ?>consultation</h2> </div>
 
             <!-- Formulaire principal d'ajout d'un patient -->
             <form method = "post" action = "ajout.php?type=patient<?php echo isset($_GET['idModif']) ? '&idModif='.$_GET['idModif'] : ''?>" style = "display:<?php echo $type == 'patient' ? 'block': 'none'?>" class = "Patient" id = "formPatient">
@@ -115,8 +119,8 @@
                         <div class = "formInput">
                             <div class = "formLabel">Civilité:</div>
                             <div class = "formDouble">
-                                <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civiliteP" id = "madame"   value = "Mme" checked = "<?php echo ($type == "patient" && $champs['civiliteP'] == "Mme") ? "checked" : "" ?>"> 
-                                <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civiliteP" id = "monsieur" value = "M"   checked = "<?php echo ($type == "patient" && $champs['civiliteP'] == "M"  ) ? "checked" : "" ?>"> <br>
+                                <label for = "madameP"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civiliteP" id = "madameP"   value = "Mme" checked = "<?php echo ($type == "patient" && $champs['civiliteP'] == "Mme") ? "checked" : "" ?>"> 
+                                <label for = "monsieurP" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civiliteP" id = "monsieurP" value = "M"   checked = "<?php echo ($type == "patient" && $champs['civiliteP'] == "M"  ) ? "checked" : "" ?>"> <br>
                             </div>
                         </div>
 
@@ -208,8 +212,8 @@
                     <div class = "formInput">
                         <div class = "formLabel">Civilité:</div>
                         <div class = "formDouble">
-                            <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civiliteM" id = "madame"   value = "Mme" checked = "<?php echo ($type == "medecin" && $champs['civiliteM'] == "Mme") ? "checked" : "" ?>"> 
-                            <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civiliteM" id = "monsieur" value = "M"   checked = "<?php echo ($type == "medecin" && $champs['civiliteM'] == "M"  ) ? "checked" : "" ?>"> <br>
+                            <label for = "madameM"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civiliteM" id = "madameM"   value = "Mme" checked = "<?php echo ($type == "medecin" && $champs['civiliteM'] == "Mme") ? "checked" : "" ?>"> 
+                            <label for = "monsieurM" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civiliteM" id = "monsieurM" value = "M"   checked = "<?php echo ($type == "medecin" && $champs['civiliteM'] == "M"  ) ? "checked" : "" ?>"> <br>
                         </div>
                     </div>
 
@@ -242,7 +246,7 @@
                                 <label for = "patientC">Patient:</label>
                             </div>
                             <select name = "patientC" id = "patientC">
-                                <option>Aucun</option>
+                                <option value = "-1">Aucun</option>
                                 <?php
                                     try {
                                         $linkpdopdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
@@ -257,7 +261,7 @@
                                         $idPatientC = $data[3];
                                         $idMedecinT = $data[4];
                                 ?>
-                                <option data-idMedecin = "<?php echo $idMedecinT?>" value ="<?php echo $idPatientC?>"> <?php echo $string; ?></option>
+                                <option data-idMedecin = "<?php echo $idMedecinT?>" value ="<?php echo $idPatientC?>" <?php echo ($type == "consultation" && $champs['patientC'] == $data[3]) ? "selected" : "" ?>> <?php echo $string; ?></option>
 
                                 <?php
                                 }
@@ -270,7 +274,7 @@
                                 <label for = "medecinC">Médecin :</label>
                             </div>
                             <select name = "medecinC" id = "medecinC">
-                                <option>Aucun</option>
+                                <option value = "-1">Aucun</option>
                                 <?php
                                     try {
                                         $linkpdopdo = new PDO("mysql:host=localhost;dbname=cabinet", 'root', '');
@@ -284,7 +288,7 @@
                                         $string = $data[2].". ".$data[0]." ".$data[1];
                                         $idMedecin = $data[3];
                                 ?>
-                                <option value="<?php echo $idMedecin?>"> <?php echo $string; ?> </option>
+                                <option value="<?php echo $idMedecin?>"> <?php echo $string; ?> <?php echo ($type == "consultation" && $champs['medecinC'] == $data[3]) ? "selected" : "" ?> </option>
 
                                 <?php
                                 }
