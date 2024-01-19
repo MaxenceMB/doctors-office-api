@@ -46,7 +46,6 @@
                         if(isset($_GET['idModif'])) {
                             $idConsultation = explode('|', $_GET['idModif']);
                             $champs = getConsultation($idConsultation);
-                            echo implode(', ', $champs);
                         } else {
                             $champs = getConsultationVide();
                         }
@@ -65,6 +64,7 @@
                         if(isset($_GET['idModif'])) {
                             updatePatient($_GET['idModif'], $_POST);
                             $champs = getPatient($_GET['idModif']);
+                            header("Location: affichage.php?type=patient");
                         } else {
                             addPatient($_POST);
                         }
@@ -79,6 +79,8 @@
                     } else {
                         if(isset($_GET['idModif'])) {
                             updateMedecin($_GET['idModif'], $_POST);
+                            $champs = getMedecin($_GET['idModif']);
+                            header("Location: affichage.php?type=medecin");
                         } else {
                             addMedecin($_POST);
                         }
@@ -86,13 +88,15 @@
 
                 } else if(isset($_POST["validerConsultation"])) {
 
-                    $err = checkConsultation($_POST);
+                    $err = checkConsultation($_POST, $champs);
                     if($err != "") {
                         echo $err;
                         $champs = array_slice($_POST, 0, count($_POST)-1);
                     } else {
                         if(isset($_GET['idModif'])) {
-                            updateConsultation($_GET['idModif'], $_POST);
+                            updateConsultation($idConsultation, $_POST);
+                            $champs = getConsultation($idConsultation);
+                            header("Location: affichage.php?type=consultation");
                         } else {
                             addConsultation($_POST);
                         }
@@ -278,7 +282,7 @@
                                         $string = $data[2]." ".$data[0]." ".$data[1];
                                         $idMedecin = $data[3];
                                 ?>
-                                <option value="<?php echo $idMedecin?>"> <?php echo $string; ?> <?php echo ($type == "consultation" && $champs['medecinC'] == $data[3]) ? "selected" : "" ?> </option>
+                                <option value = "<?php echo $idMedecin?>" <?php echo ($type == "consultation" && $champs['medecinC'] == $data[3]) ? "selected" : "" ?>> <?php echo $string; ?></option>
 
                                 <?php
                                 }

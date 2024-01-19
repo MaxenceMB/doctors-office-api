@@ -341,7 +341,7 @@ include 'getlinkpdo.php';
                             'heure'    => $heure));
 
         if ($req->rowCount() == 0 && $req->rowCount() > 1) {
-            die("Erreur requête médecin.<br>");
+            die("Erreur requête consultation.<br>");
         } else {
             $data = $req->fetch();
             $i = 0;
@@ -352,6 +352,7 @@ include 'getlinkpdo.php';
             }                                               // $consultation[1] =    
                                                             // $consultation[2] = 
 
+            $consultation['heureC'] = substr($consultation['heureC'], 0, 5);
             $consultation['dureeC'] = sprintf("%02d:%02d", intdiv($consultation['dureeC'], 60), $consultation['dureeC']%60);
             return $consultation;                     
         }
@@ -389,11 +390,11 @@ include 'getlinkpdo.php';
         $medecin = $CONSULTATION["medecinC"];
         $datec   = $CONSULTATION["dateC"];
         $heure   = $CONSULTATION["heureC"];
-        $duree   = $CONSULTATION["dureeC"];
+        $duree   = intval(substr($CONSULTATION["dureeC"], 0, 2)) * 60 + intval(substr($CONSULTATION["dureeC"], 3, 2));
 
-        $oldPatient = $id["oldPatient"];
-        $oldDate    = $id["oldDate"];
-        $oldHeure   = $id["oldHeure"];
+        $oldPatient = $id[0];
+        $oldDate    = $id[1];
+        $oldHeure   = substr($id[2], 0, 5);
 
 
         // Préparation
@@ -402,9 +403,9 @@ include 'getlinkpdo.php';
                                          heureRDV    = :heure,
                                          duree       = :duree,
                                          idMedecin   = :idMedecin 
-                                  WHERE  idPatient   = :oldPatient, 
-                                         dateRDV     = :oldDate, 
-                                         heureRDV    = :oldHeure;');
+                                  WHERE  idPatient   = :oldPatient 
+                                  AND    dateRDV     = :oldDate 
+                                  AND    heureRDV    = :oldHeure;');
 
         // Requête
         $req->execute(array('datec'      => $datec,

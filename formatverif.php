@@ -44,7 +44,7 @@
         $adspe = str_replace("-", "", str_replace(" ", "", $adresse));                                   //////////////////////////
         if(strlen($adspe) == 0 && $primaire) { return "ADR_VIDE"; }                                      // Vide                 //
         if(strlen($adresse) > 30) { return "ADR_LONG"; }                                                 // Trop long            //
-        if(preg_match('/[^a-zA-Zà-üÀ-Ü0-9 -]+/', $adresse, $matches)) { return "ADR_SPE"; }              // Caractères spéciaux  //
+        if(preg_match('/[^a-zA-Zà-üÀ-Ü0-9 -,]+/', $adresse, $matches)) { return "ADR_SPE"; }             // Caractères spéciaux  //
                                                                                                          //////////////////////////
         return "";
     }
@@ -197,27 +197,29 @@
      * - Prend la variable à vérifier (l'id) en argument.
      * - Renvoie un string vide si tout va bien, code d'erreur sinon.
      **********************************************/
-    function estLibre($qui, $CONSULTATION) {
+    function estLibre($qui, $CONSULTATION, $OLD) {
         include 'getlinkpdo.php';
-
+    
         if($qui == "patient") {
             $req = $linkpdo->prepare('SELECT *
                                       FROM  consultation
                                       WHERE idPatient = :idPatient
                                       AND   dateRDV = :datec
-                                      AND   ((:heurec BETWEEN heureRDV AND (heureRDV + duree - 1))
-                                      OR    ((:heurec + :duree - 1) BETWEEN heureRDV AND (heureRDV + duree - 1))
-                                      OR    (heureRDV BETWEEN :heurec AND (:heurec + :duree - 1)));');
-
+                                      AND   ((:heurec BETWEEN heureRDV AND (heureRDV + duree))
+                                      OR    ((:heurec + :duree) BETWEEN heureRDV AND (heureRDV + duree))
+                                      OR    (heureRDV BETWEEN :heurec AND (:heurec + :duree)))
+                                      AND   idPatient != :oldPatient
+                                      AND   dateRDV != :oldDatec
+                                      AND   heureRDV != :oldHeurec;');
+    
             $req->execute(array(':idPatient'  => $CONSULTATION['patientC'],
                                 ':datec'      => $CONSULTATION['dateC'],
                                 ':heurec'     => $CONSULTATION['heureC'],
-                                ':heurec'     => $CONSULTATION['heureC'],
-                                ':duree'      => $CONSULTATION['dureeC'],
-                                ':heurec'     => $CONSULTATION['heureC'],
-                                ':heurec'     => $CONSULTATION['heureC'],
-                                ':duree'      => $CONSULTATION['dureeC']));     
-
+                                ':oldPatient' => $OLD['patientC'],
+                                ':oldDatec'   => $OLD['dateC'],
+                                ':oldHeurec'  => $OLD['heureC'],
+                                ':duree'      => intval(substr($CONSULTATION['dureeC'], 0, 2)) * 60 + intval(substr($CONSULTATION['dureeC'], 3, 2))));  
+    
         } else if($qui == "medecin") {
             $req = $linkpdo->prepare('SELECT *
                                       FROM  consultation
@@ -225,27 +227,30 @@
                                       AND   dateRDV = :datec
                                       AND   ((:heurec BETWEEN heureRDV AND (heureRDV + duree - 1))
                                       OR    ((:heurec + :duree - 1) BETWEEN heureRDV AND (heureRDV + duree - 1))
-                                      OR    (heureRDV BETWEEN :heurec AND (:heurec + :duree - 1)));');
-
+                                      OR    (heureRDV BETWEEN :heurec AND (:heurec + :duree - 1)))
+                                      AND   idPatient != :oldPatient
+                                      AND   dateRDV != :oldDatec
+                                      AND   heureRDV != :oldHeurec;');
+    
             $req->execute(array(':idMedecin'  => $CONSULTATION['medecinC'],
                                 ':datec'      => $CONSULTATION['dateC'],
                                 ':heurec'     => $CONSULTATION['heureC'],
-                                ':heurec'     => $CONSULTATION['heureC'],
-                                ':duree'      => $CONSULTATION['dureeC'],
-                                ':heurec'     => $CONSULTATION['heureC'],
-                                ':heurec'     => $CONSULTATION['heureC'],
-                                ':duree'      => $CONSULTATION['dureeC']));     
-                                      
+                                ':oldPatient' => $OLD['patientC'],
+                                ':oldDatec'   => $OLD['dateC'],
+                                ':oldHeurec'  => $OLD['heureC'],
+                                ':duree'      => intval(substr($CONSULTATION['dureeC'], 0, 2)) * 60 + intval(substr($CONSULTATION['dureeC'], 3, 2))));  
+                                
         } else {
             return "Err interne: 'Qui' invalide dans estLibre()";
         }
-                                                                                                         //////////////////////////
-        if ($req->rowCount() > 0) {                                                                      // Déja pris            //
-            return strtoupper(substr($qui, 0, 3))."_PRIS";                                               //////////////////////////
+                                                                                                                            
+        if ($req->rowCount() > 0) {                                                                                          
+            return strtoupper(substr($qui, 0, 3))."_PRIS";                                                                   
         }
-
+    
         return "";
     }
+    
 
 
     /**********************************************
@@ -308,14 +313,14 @@
      * - Prend le $_POST de la page ajout en argument.
      * - Renvoie un string vide si tout va bien, un code d'erreur sinon.
      **********************************************/
-    function checkConsultation($CONSULTATION) {
+    function checkConsultation($CONSULTATION, $OLD) {
         return ((isset($CONSULTATION["patientC"])) ? checkId($CONSULTATION["patientC"], "patient", false) : "PAT_INV") ?:
                ((isset($CONSULTATION["medecinC"])) ? checkId($CONSULTATION["medecinC"], "medecin", false) : "MED_INV") ?:
                ((isset($CONSULTATION["dateC"]))    ? checkDateConsultation($CONSULTATION["dateC"]) : "DAT_INV") ?:
                ((isset($CONSULTATION["heureC"]) && isset($CONSULTATION["dureeC"])) ? checkHeure($CONSULTATION["heureC"], $CONSULTATION["dureeC"]) : "HR_INV" ) ?:
 
-               (estLibre("patient", $CONSULTATION)) ?:
-               (estLibre("medecin", $CONSULTATION));
+               (estLibre("patient", $CONSULTATION, $OLD)) ?:
+               (estLibre("medecin", $CONSULTATION, $OLD));
     }
 
 
