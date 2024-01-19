@@ -214,7 +214,7 @@
 
 
     <div id="createButton">
-        <a href="saisie.php?type=consultation" class="btna blue">
+        <a href="ajout.php?type=consultation" class="btna blue">
             Ajouter une consultation
         </a>
     </div>

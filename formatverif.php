@@ -118,25 +118,127 @@
 
 
     /**********************************************
-     * CHECK ID MEDECIN
-     * Vérifie que l'id médecin indiqué soit valide, soit:
+     * CHECK ID
+     * Vérifie que l'id indiqué soit valide, soit:
      * - égal à -1 pour aucun
      * - Ou juste existant
      * 
-     * - Prend la variable à vérifier (l'id médecin) en argument.
-     * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon.
+     * - Prend la variable à vérifier (l'id) en argument.
+     * - Renvoie un string vide si tout va bien, code d'erreur sinon.
      **********************************************/
-    function checkIdMedecin($medecin) {
+    function checkId($id, $table) {
         include 'getlinkpdo.php';
 
-        // Vérification si le medecin existe
-        $req = $linkpdo->prepare('SELECT *
-                                  FROM   medecin
-                                  WHERE  idMedecin = :idMedecin;');
+        if($table == "patient") {
+            $req = $linkpdo->prepare('SELECT * 
+                                      FROM   patient  
+                                      WHERE  idPatient = :id;');
+        } else if($table == "medecin") {
+            $req = $linkpdo->prepare('SELECT * 
+                                      FROM   medecin 
+                                      WHERE  idMedecin = :id;');
+        } else {
+            return "Err interne: Table invalide dans checkId()";
+        }
 
-        $req->execute(array(':idMedecin' => $medecin));                                                  //////////////////////////
-        if ($req->rowCount() == 0 && $medecin != -1) {                                                   // Introuvable & pas -1 //
-            return "MED_INV";                                                                            //////////////////////////
+        $req->execute(array(':id'  => $id));                                                             //////////////////////////
+        if ($req->rowCount() == 0 && $id != -1) {                                                        // Introuvable & pas -1 //
+            return strtoupper(substr($table, 0, 3))."_INV";                                              //////////////////////////
+        }
+
+        return "";
+    }
+
+    /**********************************************
+     * CHECK DATE CONSULTATION
+     * Vérifie que la date de la consultation soit supérieure ou égale à la date du jour 
+     * 
+     * - Prend la variable à vérifier (la date de la consultation) en argument.
+     * - Renvoie un string vide si tout va bien, un code d'erreur sinon.
+     **********************************************/
+    function checkDateConsultation($dateN) {                                                             //////////////////////////
+        if(strlen($dateN) != 10) { return "DATE_INV"; }                                                  // Taille invalide      //
+        if(preg_match('/[^0-9-]+/', $dateN, $matches)) { return "DATE_SPE"; }                            // Caractères spéciaux  //
+        if($dateN < date("Y-m-d")) { return "DATE_ANT"; }                                                // Date antérieure      //
+                                                                                                         //////////////////////////
+        return "";
+    }
+
+
+    /**********************************************
+     * CHECK HEURE
+     * Vérifie que la heure de la consultation soit supérieure à 8h
+     * Et que la consultation ne dépasse pas 21h
+     * 
+     * - Prend la variable à vérifier (l'heure de la consultation) en argument.
+     * - Renvoie un string vide si tout va bien, un code d'erreur sinon.
+     **********************************************/
+    function checkHeure($heure, $duree) {                                                                //////////////////////////
+        if(strlen($heure) != 5) { return "HR_INV"; }                                                     // Taille invalide      //
+        if(preg_match('/[^0-9:]+/', $heure, $matches)) { return "HR_SPE"; }                              // Caractères spéciaux  //
+                                                                                                         //                      //
+        $heureMinutes = intval(substr($heure, 0, 2)) * 60 + intval(substr($heure, 3, 2));                //                      //
+        $heureFin = $heureMinutes + intval(substr($duree, 0, 2)) * 60 + intval(substr($duree, 3, 2));    //                      //
+                                                                                                         //                      //
+        if($heureFin > 20 * 60) { return "HR_SUP"; }                                                     // Heure trop élevée    //
+        if($heureMinutes < 8 * 60) { return "HR_INF"; }                                                  // Heure trop ancienne  //
+                                                                                                         //////////////////////////
+        return "";
+    }
+
+
+    /**********************************************
+     * EST LIBRE
+     * Vérifie que l'id indiqué ne soit pas pris par une autre consultation
+     * 
+     * - Prend la variable à vérifier (l'id) en argument.
+     * - Renvoie un string vide si tout va bien, code d'erreur sinon.
+     **********************************************/
+    function estLibre($qui, $CONSULTATION) {
+        include 'getlinkpdo.php';
+
+        if($qui == "patient") {
+            $req = $linkpdo->prepare('SELECT COUNT(*) 
+                                      FROM  consultation
+                                      WHERE idPatient = :idPatient
+                                      AND   dateRDV = :datec
+                                      AND   ((:heurec BETWEEN heureRDV AND (heureRDV + duree - 1))
+                                      OR    ((:heurec + :duree - 1) BETWEEN heureRDV AND (heureRDV + duree - 1))
+                                      OR    (heureRDV BETWEEN :heurec AND (:heurec + :duree - 1)));');
+
+            $req->execute(array(':idPatient'  => $CONSULTATION['patientC'],
+                                ':datec'      => $CONSULTATION['dateC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':duree'      => $CONSULTATION['dureeC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':duree'      => $CONSULTATION['dureeC']));     
+
+        } else if($qui == "medecin") {
+            $req = $linkpdo->prepare('SELECT COUNT(*) 
+                                      FROM  consultation
+                                      WHERE idMedecin = :idMedecin
+                                      AND   dateRDV = :datec
+                                      AND   ((:heurec BETWEEN heureRDV AND (heureRDV + duree - 1))
+                                      OR    ((:heurec + :duree - 1) BETWEEN heureRDV AND (heureRDV + duree - 1))
+                                      OR    (heureRDV BETWEEN :heurec AND (:heurec + :duree - 1)));');
+
+            $req->execute(array(':idMedecin'  => $CONSULTATION['medecinC'],
+                                ':datec'      => $CONSULTATION['dateC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':duree'      => $CONSULTATION['dureeC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':heurec'     => $CONSULTATION['heureC'],
+                                ':duree'      => $CONSULTATION['dureeC']));     
+                                      
+        } else {
+            return "Err interne: 'Qui' invalide dans estLibre()";
+        }
+                                                                                                         //////////////////////////
+        if ($req->rowCount() > 0) {                                                                      // Déja pris            //
+            return strtoupper(substr($qui, 0, 3))."_PRIS";                                               //////////////////////////
         }
 
         return "";
@@ -158,17 +260,17 @@
      * - Renvoie un string vide si tout va bien, des messages d'erreurs sinon.
      **********************************************/
     function checkPatient($PATIENT) {
-        return ((isset($PATIENT["civilite"]))        ? checkCivilite($PATIENT["civilite"])         : "CIV_INV"    ) ?:
-               ((isset($PATIENT["nom"]))             ? checkNom($PATIENT["nom"], "nom")            : "NOM_INV"    ) ?:
-               ((isset($PATIENT["prenom"]))          ? checkNom($PATIENT["prenom"], "prenom")      : "PRENOM_INV" ) ?:
-               ((isset($PATIENT["numSecu"]))         ? checkSecurite($PATIENT["numSecu"])          : "SECU_INV"   ) ?:
-               ((isset($PATIENT["medecinTraitant"])) ? checkIdMedecin($PATIENT["medecinTraitant"]) : ""           ) ?:
-               ((isset($PATIENT["adresse1"]))        ? checkAdresse($PATIENT["adresse1"], true)    : "ADR_INV"    ) ?:
-               ((isset($PATIENT["adresse2"]))        ? checkAdresse($PATIENT["adresse2"], false)   : ""           ) ?:
-               ((isset($PATIENT["ville"]))           ? checkVille($PATIENT["ville"], "ville")      : "VILLE_INV"  ) ?:
-               ((isset($PATIENT["codePostal"]))      ? checkCodePostal($PATIENT["codePostal"])     : "CP_INV"     ) ?:
-               ((isset($PATIENT["villeN"]))          ? checkVille($PATIENT["villeN"], "villen")    : "VILLEN_INV" ) ?:
-               ((isset($PATIENT["dateN"]))           ? checkDateNaissance($PATIENT["dateN"])       : "DATEN_INV"  );
+        return ((isset($PATIENT["civiliteP"]))        ? checkCivilite($PATIENT["civiliteP"])              : "CIV_INV"    ) ?:
+               ((isset($PATIENT["nomP"]))             ? checkNom($PATIENT["nomP"], "nom")                 : "NOM_INV"    ) ?:
+               ((isset($PATIENT["prenomP"]))          ? checkNom($PATIENT["prenomP"], "prenom")           : "PRENOM_INV" ) ?:
+               ((isset($PATIENT["numSecuP"]))         ? checkSecurite($PATIENT["numSecuP"])               : "SECU_INV"   ) ?:
+               ((isset($PATIENT["medecinTraitantP"])) ? checkId($PATIENT["medecinTraitantP"], "medecin")  : ""           ) ?:
+               ((isset($PATIENT["adresse1P"]))        ? checkAdresse($PATIENT["adresse1P"], true)         : "ADR_INV"    ) ?:
+               ((isset($PATIENT["adresse2P"]))        ? checkAdresse($PATIENT["adresse2P"], false)        : ""           ) ?:
+               ((isset($PATIENT["villeP"]))           ? checkVille($PATIENT["villeP"], "ville")           : "VILLE_INV"  ) ?:
+               ((isset($PATIENT["codePostalP"]))      ? checkCodePostal($PATIENT["codePostalP"])          : "CP_INV"     ) ?:
+               ((isset($PATIENT["villeNP"]))          ? checkVille($PATIENT["villeNP"], "villen")         : "VILLEN_INV" ) ?:
+               ((isset($PATIENT["dateNP"]))           ? checkDateNaissance($PATIENT["dateNP"])            : "DATEN_INV"  );
     }
 
 
@@ -185,9 +287,32 @@
      * - Renvoie un string vide si tout va bien, un code d'erreur sinon.
      **********************************************/
     function checkMedecin($MEDECIN) {
-        return ((isset($MEDECIN["civilite"])) ? checkCivilite($MEDECIN["civilite"])    : "CIV_INV"   ) ?:
-               ((isset($MEDECIN["nom"]))      ? checkNom($MEDECIN["nom"], "nom")       : "NOM_INV"   ) ?:
-               ((isset($MEDECIN["prenom"]))   ? checkNom($MEDECIN["prenom"], "prenom") : "PRENOM_INV");
+        return ((isset($MEDECIN["civiliteM"])) ? checkCivilite($MEDECIN["civiliteM"])    : "CIV_INV"   ) ?:
+               ((isset($MEDECIN["nomM"]))      ? checkNom($MEDECIN["nomM"], "nom")       : "NOM_INV"   ) ?:
+               ((isset($MEDECIN["prenomM"]))   ? checkNom($MEDECIN["prenomM"], "prenom") : "PRENOM_INV");
+    }
+
+
+    /**********************************************
+     * CHECK CONSULTATION
+     * Vérifie les formats plus les créneau.
+     * 
+     * Pour ce faire, il effectue les tests sur tous les champs
+     * les uns après les autres et renvoie le premier code d'erreur
+     * rencontré. Si un string vide est renvoyé, ça veut dire que tout
+     * est passé sans problème.
+     * 
+     * - Prend le $_POST de la page ajout en argument.
+     * - Renvoie un string vide si tout va bien, un code d'erreur sinon.
+     **********************************************/
+    function checkConsultation($CONSULTATION) {
+        return ((isset($CONSULTATION["patientC"])) ? checkId($CONSULTATION["patientC"], "patient") : "PAT_INV") ?:
+               ((isset($CONSULTATION["medecinC"])) ? checkId($CONSULTATION["medecinC"], "medecin") : "MED_INV") ?:
+               ((isset($CONSULTATION["dateC"]))    ? checkDateConsultation($CONSULTATION["dateC"]) : "DAT_INV") ?:
+               ((isset($CONSULTATION["heureC"]) && isset($CONSULTATION["dureeC"])) ? checkHeure($CONSULTATION["heureC"], $CONSULTATION["dureeC"]) : "HR_INV" ) ?:
+
+               (estLibre("medecin", $CONSULTATION)) ?:
+               (estLibre("patient", $CONSULTATION));
     }
 
 ?>

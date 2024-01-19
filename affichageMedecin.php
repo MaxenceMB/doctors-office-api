@@ -134,8 +134,8 @@
                 <p class="countPatient"><span class="label">Patients attitrés</span><?php echo $countPatient ?><?php if ($countPatient != 0) {?> <span class="detail">(</span><a href="affichage.php?type=patient&idMedecin=<?php echo $data['idMedecin']?>" class="detail">voir la liste</a><span class="detail">)</span><?php }?></p>
             </div>
             <div class="second-part">
-                <button class="btna bluenoshadow inside-button-modifier"></button>
-                <button onclick="deleteMedecin(this)" data-patient-id="<?php echo $data['idMedecin']; ?>" class="btna rednoshadow inside-button-supprimer"></button>
+                <a href = "ajout.php?type=medecin&idModif=<?php echo $data['idMedecin']; ?>"><button class = "btna bluenoshadow inside-button-modifier"></button></a>
+                <button onclick = "deleteMedecin(this)" data-patient-id="<?php echo $data['idMedecin']; ?>" class = "btna rednoshadow inside-button-supprimer"></button>
             </div>
         </div>
         <?php

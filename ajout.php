@@ -47,6 +47,7 @@
                         break;
                 }
 
+
                 // En fonction de quel bouton est cliqué, on fait des actions différentes
                 if(isset($_POST["validerPatient"])) {
 
@@ -68,7 +69,7 @@
                     $err = checkMedecin($_POST);
                     if($err != "") {
                         echo $err;
-                        $champs = array_slice($_POST, count($_POST)-1);
+                        $champs = array_slice($_POST, 0, count($_POST)-1);
                     } else {
                         if(isset($_GET['idModif'])) {
                             updateMedecin($_GET['idModif'], $_POST);
@@ -76,7 +77,23 @@
                             addMedecin($_POST);
                         }
                     }
+
+                } else if(isset($_POST["validerConsultation"])) {
+
+                    $err = checkConsultation($_POST);
+                    if($err != "") {
+                        echo $err;
+                        $champs = array_slice($_POST, 0, count($_POST)-1);
+                    } else {
+                        if(isset($_GET['idModif'])) {
+                            updateConsultation($_GET['idModif'], $_POST);
+                        } else {
+                            addConsultation($_POST);
+                        }
+                    }
                 }
+
+                echo implode(', ', $champs);
             ?>
 
             <div id = "tabs">
@@ -98,29 +115,29 @@
                         <div class = "formInput">
                             <div class = "formLabel">Civilité:</div>
                             <div class = "formDouble">
-                                <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civilite" id = "madame"   value = "Mme" checked = "<?php echo ($champs['civilite'] == "Mme") ? "checked" : "" ?>"> 
-                                <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civilite" id = "monsieur" value = "M"   checked = "<?php echo ($champs['civilite'] == "M")   ? "checked" : "" ?>"> <br>
+                                <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civiliteP" id = "madame"   value = "Mme" checked = "<?php echo ($type == "patient" && $champs['civiliteP'] == "Mme") ? "checked" : "" ?>"> 
+                                <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civiliteP" id = "monsieur" value = "M"   checked = "<?php echo ($type == "patient" && $champs['civiliteP'] == "M"  ) ? "checked" : "" ?>"> <br>
                             </div>
                         </div>
 
                         <div class = "formInput">
-                            <div class = "formLabel"><label for = "nom">Nom:</label></div>
-                            <input type = "text" name = "nom" id = "nom" class = "shortInput" value = "<?php echo $champs['nom'] ?>" > <br>
+                            <div class = "formLabel"><label for = "nomP">Nom:</label></div>
+                            <input type = "text" name = "nomP" id = "nomP" class = "shortInput" value = "<?php echo ($type == "patient") ? $champs['nomP'] : "" ?>" > <br>
                         </div>
 
                         <div class = "formInput">
-                            <div class = "formLabel"><label for = "prenom" >Prénom:</label></div>
-                            <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = "<?php echo $champs['prenom'] ?>" > <br>
+                            <div class = "formLabel"><label for = "prenomP" >Prénom:</label></div>
+                            <input type = "text" name = "prenomP" id = "prenomP" class = "shortInput" value = "<?php echo ($type == "patient") ? $champs['prenomP'] : "" ?>" > <br>
                         </div> 
 
                         <div class = "formInput">
-                            <div class = "formLabel"><label for = "numSecu">Sécurité Sociale:</label></div>
-                            <input type = "text" name = "numSecu" id = "numSecu" class = "shortInput" value = "<?php echo $champs['numSecu'] ?>">
+                            <div class = "formLabel"><label for = "numSecuP">Sécurité Sociale:</label></div>
+                            <input type = "text" name = "numSecuP" id = "numSecuP" class = "shortInput" value = "<?php echo ($type == "patient") ? $champs['numSecuP'] : "" ?>">
                         </div>
 
                         <div class = "formInput">
-                            <div class = "formLabel"><label for = "medecinTraitant">Médecin traitant:</label></div>
-                            <select name = "medecinTraitant" id = "medecinTraitant" class = "shortInput">
+                            <div class = "formLabel"><label for = "medecinTraitantP">Médecin traitant:</label></div>
+                            <select name = "medecinTraitantP" id = "medecinTraitantP" class = "shortInput">
                                 <option value = "-1">Aucun</option>
                                 <?php
 
@@ -130,7 +147,7 @@
                                     while ($data = $resMedecinString->fetch()) {
                                         $string = $data[2].". ".$data[0]." ".$data[1];
                                         $idMedecinT = $data[3]; ?>
-                                        <option value = "<?php echo $idMedecinT?>" <?php echo ($champs['medecinTraitant'] == $data[3]) ? "selected" : "" ?>> <?php echo $string; ?> </option>
+                                        <option value = "<?php echo $idMedecinT?>" <?php echo ($type == "patient" && $champs['medecinTraitantP'] == $data[3]) ? "selected" : "" ?>> <?php echo $string; ?> </option>
                                     <?php } ?>
                             </select>
                         </div>
@@ -141,24 +158,24 @@
                         <p class = "formHeader">Lieu de résidence</p>
 
                         <div class = "formInput">
-                            <div class = "formLabel"><label for = "adresse1">Adresse:</label></div>
-                            <input type = "text" name = "adresse1" id = "adresse1" class = "longInput" value = "<?php echo $champs['adresse1'] ?>"> <br>
+                            <div class = "formLabel"><label for = "adresse1P">Adresse:</label></div>
+                            <input type = "text" name = "adresse1P" id = "adresse1P" class = "longInput" value = "<?php echo ($type == "patient") ? $champs['adresse1P'] : "" ?>"> <br>
                         </div>
 
                         <div class = "formInput">
-                            <div class = "formLabel"><label for = "adresse2">Complément d'adresse:</label></div>
-                            <input type = "text" name = "adresse2" id = "adresse2" class = "longInput" value = "<?php echo $champs['adresse2'] ?>"> <br>
+                            <div class = "formLabel"><label for = "adresse2P">Complément d'adresse:</label></div>
+                            <input type = "text" name = "adresse2P" id = "adresse2P" class = "longInput" value = "<?php echo ($type == "patient") ? $champs['adresse2P'] : "" ?>"> <br>
                         </div>
 
                         <div class = "formDouble">
                             <div class = "formInput longDouble">
-                                <div class = "formLabel"><label for = "ville">Ville:</label></div>
-                                <input type = "text" name = "ville" id = "ville" class = "shortInput" value = "<?php echo $champs['ville'] ?>">
+                                <div class = "formLabel"><label for = "villeP">Ville:</label></div>
+                                <input type = "text" name = "villeP" id = "villeP" class = "shortInput" value = "<?php echo ($type == "patient") ? $champs['villeP'] : "" ?>">
                             </div>
 
                             <div class = "formInput shortDouble">
-                                <div class = "formLabel formSecondLabel"><label for = "codePostal">Code postal:</label></div>
-                                <input type = "text" name = "codePostal" id = "codePostal" value = "<?php echo $champs['codePostal'] ?>">
+                                <div class = "formLabel formSecondLabel"><label for = "codePostalP">Code postal:</label></div>
+                                <input type = "text" name = "codePostalP" id = "codePostalP" value = "<?php echo ($type == "patient") ? $champs['codePostalP'] : "" ?>">
                             </div>
                         </div>
 
@@ -166,13 +183,13 @@
 
                         <div class = "formDouble">
                             <div class = "formInput longDouble">
-                                <div class = "formLabel"><label for = "villeN">Ville:</label></div>
-                                <input type = "text" name = "villeN" id = "villeN" class = "shortInput" value = "<?php echo $champs['villeN'] ?>">
+                                <div class = "formLabel"><label for = "villeNP">Ville:</label></div>
+                                <input type = "text" name = "villeNP" id = "villeNP" class = "shortInput" value = "<?php echo ($type == "patient") ? $champs['villeNP'] : "" ?>">
                             </div>
 
                             <div class = "formInput shortDouble">
-                                <div class = "formLabel formSecondLabel"><label for = "dateN">Date:</label></div>
-                                <input type = "date" id = "dateN" name = "dateN" value = "<?php echo $champs['dateN'] ?>"/>             
+                                <div class = "formLabel formSecondLabel"><label for = "dateNP">Date:</label></div>
+                                <input type = "date" id = "dateNP" name = "dateNP" value = "<?php echo ($type == "patient") ? $champs['dateNP'] : "" ?>"/>             
                             </div>
                         </div>
                         
@@ -191,19 +208,19 @@
                     <div class = "formInput">
                         <div class = "formLabel">Civilité:</div>
                         <div class = "formDouble">
-                            <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civilite" id = "madame"   value = "Mme" checked = "<?php echo ($champs[3] == "Mme") ? "checked" : "" ?>"> 
-                            <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civilite" id = "monsieur" value = "M"   checked = "<?php echo ($champs[3] == "M")   ? "checked" : "" ?>"> <br>
+                            <label for = "madame"   class = "formRadioLabel">Madame</label>   <input type = "radio" name = "civiliteM" id = "madame"   value = "Mme" checked = "<?php echo ($type == "medecin" && $champs['civiliteM'] == "Mme") ? "checked" : "" ?>"> 
+                            <label for = "monsieur" class = "formRadioLabel">Monsieur</label> <input type = "radio" name = "civiliteM" id = "monsieur" value = "M"   checked = "<?php echo ($type == "medecin" && $champs['civiliteM'] == "M"  ) ? "checked" : "" ?>"> <br>
                         </div>
                     </div>
 
                     <div class = "formInput">
-                        <div class = "formLabel"><label for = "nom">Nom:</label></div>
-                        <input type = "text" name = "nom" id = "nom" class = "shortInput" value = ""> <br>
+                        <div class = "formLabel"><label for = "nomM">Nom:</label></div>
+                        <input type = "text" name = "nomM" id = "nomM" class = "shortInput" value = "<?php echo ($type == "medecin") ? $champs['nomM'] : "" ?>"> <br>
                     </div>
 
                     <div class = "formInput">
-                        <div class = "formLabel"><label for = "prenom" >Prénom:</label></div>
-                        <input type = "text" name = "prenom" id = "prenom" class = "shortInput" value = ""> <br>
+                        <div class = "formLabel"><label for = "prenomM" >Prénom:</label></div>
+                        <input type = "text" name = "prenomM" id = "prenomM" class = "shortInput" value = "<?php echo ($type == "medecin") ? $champs['prenomM'] : "" ?>"> <br>
                     </div>    
                 </div>
                 
@@ -222,9 +239,9 @@
 
                         <div class = "formInput">
                             <div class = "formLabel">
-                                <label for = "patient">Patient:</label>
+                                <label for = "patientC">Patient:</label>
                             </div>
-                            <select name="patient" id="patient">
+                            <select name = "patientC" id = "patientC">
                                 <option>Aucun</option>
                                 <?php
                                     try {
@@ -250,9 +267,9 @@
 
                         <div class = "formInput">
                             <div class = "formLabel">
-                                <label for = "medecin">Médecin :</label>
+                                <label for = "medecinC">Médecin :</label>
                             </div>
-                            <select name = "medecin" id = "medecin">
+                            <select name = "medecinC" id = "medecinC">
                                 <option>Aucun</option>
                                 <?php
                                     try {
@@ -281,19 +298,19 @@
                         <p class = "formHeader">Créneau</p>
 
                         <div class = "formInput">
-                            <label class = "formLabel" for = "startDate">Date</label>
-                            <input class = "longInput" type = "date" id="startDate" name="startDate" min="2018-01-01" max="2030-12-31" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['startDate'] : '' ?>"/>                     
+                            <label class = "formLabel" for = "dateC">Date</label>
+                            <input class = "longInput" type = "date" id = "dateC" name = "dateC" min="2018-01-01" max="2030-12-31" value = "<?php echo ($type == "consultation") ? $champs['dateC'] : '' ?>"/>                     
                         </div>
 
                         <div class = "formDouble">
                             <div class = "formInput longDouble">
-                                <label class = "formLabel" for = "startDate">Heure</label>
-                                <input type = "time" id="startHours" name="startHours" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['startHours'] : '' ?>"/>         
+                                <label class = "formLabel" for = "heureC">Heure</label>
+                                <input type = "time" id = "heureC" name = "heureC" value = "<?php echo ($type == "consultation") ? $champs['heureC'] : '' ?>"/>         
                             </div>
 
                             <div class = "formInput longDouble">
-                                <label class = "formLabel formSecondLabel" for = "startDate">Durée</label>
-                                <input type = "date" id="startDate" name="startDate" min="2018-01-01" max="2030-12-31" value="<?php echo (isset($_POST['rechercherConsultation'])) ? $_POST['startDate'] : '' ?>"/>                      
+                                <label class = "formLabel formSecondLabel" for = "dureeC">Durée</label>
+                                <input type = "time" id = "dureeC" name = "dureeC" value = "<?php echo ($type == "consultation") ? $champs['dureeC'] : '' ?>"/>                      
                             </div>
                         </div>
                     </div> 

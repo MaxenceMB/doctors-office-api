@@ -1,6 +1,9 @@
 <?php
 include 'getlinkpdo.php';
 
+    // PATIENTS //
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**********************************************
      * ADD PATIENT
      * Ajoute un patient à la base de données
@@ -21,17 +24,17 @@ include 'getlinkpdo.php';
         }
 
         // Variables
-        $nom        = $PATIENT["nom"];
-        $prenom     = $PATIENT["prenom"];
-        $civilite   = $PATIENT["civilite"];
-        $adresse1   = $PATIENT["adresse1"];
-        $adresse2   = $PATIENT["adresse2"];
-        $ville      = $PATIENT["ville"];
-        $codePostal = $PATIENT["codePostal"];
-        $villeN     = $PATIENT["villeN"];
-        $dateN      = $PATIENT["dateN"];
-        $numSecu    = $PATIENT["numSecu"];
-        $idMedecin  = $PATIENT["medecinTraitant"];
+        $nom        = $PATIENT["nomP"];
+        $prenom     = $PATIENT["prenomP"];
+        $civilite   = $PATIENT["civiliteP"];
+        $adresse1   = $PATIENT["adresse1P"];
+        $adresse2   = $PATIENT["adresse2P"];
+        $ville      = $PATIENT["villeP"];
+        $codePostal = $PATIENT["codePostalP"];
+        $villeN     = $PATIENT["villeNP"];
+        $dateN      = $PATIENT["dateNP"];
+        $numSecu    = $PATIENT["numSecuP"];
+        $idMedecin  = $PATIENT["medecinTraitantP"];
 
         // Préparation
         $req = $linkpdo->prepare('INSERT INTO patient(nom, prenom, civilite, adresse1, adresse2, ville, codePostal, villeNaissance, dateNaissance, numSecu, idMedecin)
@@ -49,42 +52,6 @@ include 'getlinkpdo.php';
                             'dateN'      => $dateN,
                             'numSecu'    => $numSecu,
                             'idMedecin'  => $idMedecin));
-    }
-
-    
-    /**********************************************
-     * ADD MEDECIN
-     * Ajoute un médecin à la base de données
-     * 
-     * - Prend le $_POST de la page ajout en argument
-     **********************************************/
-    function addMedecin($MEDECIN) {
-        global $linkpdo;
-
-        // Vérification si le medecin existe déjà
-        $req = $linkpdo->prepare('SELECT * 
-                                  FROM   medecin 
-                                  WHERE  LOWER(nom)    = LOWER(:nom)  
-                                  AND    LOWER(prenom) = LOWER(:prenom);');
-
-        $req->execute(array(':nom' => $MEDECIN["nom"], ':prenom' => $MEDECIN["prenom"]));
-        if ($req->rowCount() > 0) {
-            die("Le médecin existe déjà dans la base de données.<br>");
-        }
-        
-        // Variables
-        $nom        = $_POST["nom"];
-        $prenom     = $_POST["prenom"];
-        $civilite   = $_POST["civilite"];
-
-        // Préparation
-        $req = $linkpdo->prepare('INSERT INTO medecin(nom, prenom, civilite)
-                                  VALUES(:nom, :prenom, :civilite)');
-
-        // Requête
-        $req->execute(array('nom' => $nom,
-                            'prenom' => $prenom,
-                            'civilite' => $civilite));
     }
 
 
@@ -120,6 +87,7 @@ include 'getlinkpdo.php';
 
     }
 
+
     /**********************************************
      * GET PATIENT VIDE
      * Remplie un array avec du vide et les clés correspondantes
@@ -127,19 +95,112 @@ include 'getlinkpdo.php';
      * - Renvoie un array vide
      **********************************************/
     function getPatientVide() {
-        $vide = array("civilite"        => "",
-                      "nom"             => "",
-                      "prenom"          => "",
-                      "numSecu"         => "",
-                      "medecinTraitant" => "",
-                      "adresse1"        => "",
-                      "adresse2"        => "",
-                      "ville"           => "",
-                      "codePostal"      => "",
-                      "villeN"          => "",
-                      "dateN"           => "",);
+        $vide = array("civiliteP"        => "",
+                      "nomP"             => "",
+                      "prenomP"          => "",
+                      "numSecuP"         => "",
+                      "medecinTraitantP" => "",
+                      "adresse1P"        => "",
+                      "adresse2P"        => "",
+                      "villeP"           => "",
+                      "codePostalP"      => "",
+                      "villeNP"          => "",
+                      "dateNP"           => "",);
 
         return $vide;
+    }
+
+
+    /**********************************************
+     * UPDATE PATIENT
+     * Modifie un patient de la base de données
+     * 
+     * - Prend l'id et le $_POST de la page ajout en argument
+     **********************************************/
+    function updatePatient($id, $PATIENT) {
+        global $linkpdo;
+
+        // Variables
+        $nom        = $PATIENT["nomP"];
+        $prenom     = $PATIENT["prenomP"];
+        $civilite   = $PATIENT["civiliteP"];
+        $adresse1   = $PATIENT["adresse1P"];
+        $adresse2   = $PATIENT["adresse2P"];
+        $ville      = $PATIENT["villeP"];
+        $codePostal = $PATIENT["codePostalP"];
+        $villeN     = $PATIENT["villeNP"];
+        $dateN      = $PATIENT["dateNP"];
+        $numSecu    = $PATIENT["numSecuP"];
+        $idMedecin  = $PATIENT["medecinTraitantP"];
+
+        // Préparation
+        $req = $linkpdo->prepare('UPDATE patient 
+                                  SET    nom            = :nom, 
+                                         prenom         = :prenom, 
+                                         civilite       = :civilite, 
+                                         adresse1       = :adresse1, 
+                                         adresse2       = :adresse2, 
+                                         ville          = :ville, 
+                                         codePostal     = :codePostal, 
+                                         villeNaissance = :villeN, 
+                                         dateNaissance  = :dateN, 
+                                         numSecu        = :numSecu, 
+                                         idMedecin      = :idMedecin
+                                  WHERE  idPatient      = :idPatient;');
+
+        // Requête
+        $req->execute(array('nom'        => $nom,
+                            'prenom'     => $prenom,
+                            'civilite'   => $civilite,
+                            'adresse1'   => $adresse1,
+                            'adresse2'   => $adresse2,
+                            'ville'      => $ville,
+                            'codePostal' => $codePostal,
+                            'villeN'     => $villeN,
+                            'dateN'      => $dateN,
+                            'numSecu'    => $numSecu,
+                            'idMedecin'  => ($idMedecin == -1) ? NULL : $idMedecin,
+                            'idPatient'  => $id));
+    }
+
+
+
+    // MEDECINS //
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**********************************************
+     * ADD MEDECIN
+     * Ajoute un médecin à la base de données
+     * 
+     * - Prend le $_POST de la page ajout en argument
+     **********************************************/
+    function addMedecin($MEDECIN) {
+        global $linkpdo;
+
+        // Vérification si le medecin existe déjà
+        $req = $linkpdo->prepare('SELECT * 
+                                  FROM   medecin 
+                                  WHERE  LOWER(nom)    = LOWER(:nom)  
+                                  AND    LOWER(prenom) = LOWER(:prenom);');
+
+        $req->execute(array(':nom' => $MEDECIN["nomM"], ':prenom' => $MEDECIN["prenomM"]));
+        if ($req->rowCount() > 0) {
+            die("Le médecin existe déjà dans la base de données.<br>");
+        }
+        
+        // Variables
+        $nom        = $MEDECIN["nomM"];
+        $prenom     = $MEDECIN["prenomM"];
+        $civilite   = $MEDECIN["civiliteM"];
+
+        // Préparation
+        $req = $linkpdo->prepare('INSERT INTO medecin(nom, prenom, civilite)
+                                  VALUES(:nom, :prenom, :civilite)');
+
+        // Requête
+        $req->execute(array('nom' => $nom,
+                            'prenom' => $prenom,
+                            'civilite' => $civilite));
     }
 
 
@@ -183,64 +244,173 @@ include 'getlinkpdo.php';
      * - Renvoie un array vide
      **********************************************/
     function getMedecinVide() {
-        $vide = array("civilite"        => "",
-                      "nom"             => "",
-                      "prenom"          => "",);
+        $vide = array("civiliteM"        => "",
+                      "nomM"             => "",
+                      "prenomM"          => "",);
 
         return $vide;
     }
 
 
     /**********************************************
-     * UPDATE PATIENT
-     * Modifie un patient de la base de données
+     * UPDATE MEDECIN
+     * Modifie un medecin de la base de données
      * 
      * - Prend l'id et le $_POST de la page ajout en argument
      **********************************************/
-    function updatePatient($id, $PATIENT) {
+    function updateMedecin($id, $MEDECIN) {
         global $linkpdo;
 
         // Variables
-        $nom        = $PATIENT["nom"];
-        $prenom     = $PATIENT["prenom"];
-        $civilite   = $PATIENT["civilite"];
-        $adresse1   = $PATIENT["adresse1"];
-        $adresse2   = $PATIENT["adresse2"];
-        $ville      = $PATIENT["ville"];
-        $codePostal = $PATIENT["codePostal"];
-        $villeN     = $PATIENT["villeN"];
-        $dateN      = $PATIENT["dateN"];
-        $numSecu    = $PATIENT["numSecu"];
-        $idMedecin  = $PATIENT["medecinTraitant"];
+        $nom        = $MEDECIN["nomM"];
+        $prenom     = $MEDECIN["prenomM"];
+        $civilite   = $MEDECIN["civiliteM"];
 
         // Préparation
-        $req = $linkpdo->prepare('UPDATE patient 
-                                  SET nom            = :nom, 
-                                      prenom         = :prenom, 
-                                      civilite       = :civilite, 
-                                      adresse1       = :adresse1, 
-                                      adresse2       = :adresse2, 
-                                      ville          = :ville, 
-                                      codePostal     = :codePostal, 
-                                      villeNaissance = :villeN, 
-                                      dateNaissance  = :dateN, 
-                                      numSecu        = :numSecu, 
-                                      idMedecin      = :idMedecin
-                                  WHERE idPatient = :idPatient;');
+        $req = $linkpdo->prepare('UPDATE medecin 
+                                  SET    nom            = :nom, 
+                                         prenom         = :prenom, 
+                                         civilite       = :civilite 
+                                  WHERE  idMedecin      = :idMedecin;');
 
         // Requête
         $req->execute(array('nom'        => $nom,
                             'prenom'     => $prenom,
                             'civilite'   => $civilite,
-                            'adresse1'   => $adresse1,
-                            'adresse2'   => $adresse2,
-                            'ville'      => $ville,
-                            'codePostal' => $codePostal,
-                            'villeN'     => $villeN,
-                            'dateN'      => $dateN,
-                            'numSecu'    => $numSecu,
-                            'idMedecin'  => ($idMedecin == -1) ? NULL : $idMedecin,
-                            'idPatient'  => $id));
+                            'idMedecin'  => $id));
+    }
+
+
+
+    // CONSULTATIONS //
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**********************************************
+     * ADD CONSULTATION
+     * Ajoute une consultation à la base de données
+     * 
+     * - Prend le $_POST de la page ajout en argument
+     **********************************************/
+    function addConsultation($CONSULTATION) {
+        global $linkpdo;
+        
+        // Variables
+        $patient = $CONSULTATION["patientC"];
+        $medecin = $CONSULTATION["medecinC"];
+        $datec   = $CONSULTATION["dateC"];
+        $heure   = $CONSULTATION["heureC"];
+        $duree   = $CONSULTATION["dureeC"];
+
+        // Préparation
+        $req = $linkpdo->prepare('INSERT INTO consultation(idPatient, dateRDV, heureRDV, duree, idMedecin)
+                                  VALUES(:patient, :datec, :heure, :duree, :medecin)');
+
+        // Requête
+        $req->execute(array('patient'    => $patient,
+                            'datec'      => $datec,
+                            'heure'      => $heure,
+                            'duree'      => $duree,
+                            'idMedecin'  => $medecin,));
+    }
+
+
+    /**********************************************
+     * GET CONSULTATION
+     * Select * d'une consultation en ayant sa date, l'heure et le patient 
+     * 
+     * - Prend la date, l'heure et le patient en argument
+     * - Renvoie un array avec toutes les données de la consultation
+     **********************************************/
+    function getConsultation($id) {
+        global $linkpdo;
+        $consultation = getConsultationVide();
+
+        $patient = $id["patientc"];
+        $dateC   = $id["datec"];
+        $heure   = $id["heurec"];
+
+        $req = $linkpdo->prepare('SELECT idPatient, dateRDV, heureRDB, duree, idMedecin 
+                                  FROM   consultation 
+                                  WHERE  idPatient   = :patient, 
+                                         dateRDV     = :datec, 
+                                         heureRDV    = :heure;');
+
+
+        $req->execute(array('idPatient'  => $patient,
+                            'datec'      => $datec,
+                            'heure'      => $heure,));
+        if ($req->rowCount() == 0 && $req->rowCount() > 1) {
+            die("Erreur requête médecin.<br>");
+        } else {
+            $data = $req->fetch();
+            $i = 0;
+
+            foreach(array_keys($consultation) as &$key) {   // Return un array comprenant:
+                $medecin[$key] = $data[$i];                    
+                $i++;                                       // $medecin[0] = civilite
+            }                                               // $medecin[1] = nom      
+                                                            // $medecin[2] = prenom
+            return $consultation;                     
+        }
+
+    }
+
+
+    /**********************************************
+     * GET CONSULTATION VIDE
+     * Remplie un array avec du vide et les clés correspondantes
+     * 
+     * - Renvoie un array vide
+     **********************************************/
+    function getConsultationVide() {
+        $vide = array("patientC" => "",
+                      "medecinC" => "",
+                      "dateC"    => "",
+                      "heureC"   => "",
+                      "dureeC"   => "",);
+
+        return $vide;
+    }
+
+    /**********************************************
+     * UPDATE CONSULTATION
+     * Modifie une consultation de la base de données
+     * 
+     * - Prend l'id et le $_POST de la page ajout en argument
+     **********************************************/
+    function updateConsultation($id, $CONSULTATION) {
+        global $linkpdo;
+
+        // Variables
+        $patient = $CONSULTATION["patientC"];
+        $medecin = $CONSULTATION["medecinC"];
+        $datec   = $CONSULTATION["dateC"];
+        $heure   = $CONSULTATION["heureC"];
+        $duree   = $CONSULTATION["dureeC"];
+
+        $oldPatient = $id["oldPatient"];
+        $oldDate    = $id["oldDate"];
+        $oldHeure   = $id["oldHeure"];
+
+
+        // Préparation
+        $req = $linkpdo->prepare('UPDATE consultation 
+                                  SET    dateRDV     = :datec, 
+                                         heureRDV    = :heure,
+                                         duree       = :duree,
+                                         idMedecin   = :idMedecin 
+                                  WHERE  idPatient   = :oldPatient, 
+                                         dateRDV     = :oldDate, 
+                                         heureRDV    = :oldHeure;');
+
+        // Requête
+        $req->execute(array('datec'      => $datec,
+                            'heure'      => $heure,
+                            'duree'      => $duree,
+                            'idMedecin'  => $medecin,
+                            'oldPatient' => $oldPatient,
+                            'oldDate'    => $oldDate,
+                            'oldHeure'   => $oldHeure));
     }
 
 ?>
