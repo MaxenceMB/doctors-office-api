@@ -20,6 +20,10 @@ $correspondanceMessage = [
     "PRENOM_VIDE" => ["messageError", "Le prénom est vide"],
     "PRENOM_LONG" => ["messageError", "Le prénom ne peut pas dépasser 20 caractères"],
     "PRENOM_SPE" => ["messageError", "Le prénom contient des charactères interdits."],
+    "SECU_INV" => ["messageError", "Le numéro de sécurité est invalide"],
+    "CIV_INV" => ["messageError", "Civilité invalide"],
+    "ADR_VIDE" => ["messageError", "Civilité invalide"],
+    "ADR_LONG" => ["messageError", "Civilité invalide"],
 ];
 
 if (isset($_GET['message'])) {

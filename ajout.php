@@ -25,6 +25,13 @@
         <?php include "header.php";?>
 
         <main>
+
+            <?php
+
+    include 'errorMessage.php';
+
+    ?>
+
             <?php
                 include "formatverif.php";
                 include "gestionbd.php";
@@ -58,7 +65,7 @@
 
                     $err = checkPatient($_POST);
                     if($err != "") {
-                        echo $err;
+                        showMessage("messageError", $err);
                         $champs = array_slice($_POST, 0, count($_POST)-1);
                     } else {
                         if(isset($_GET['idModif'])) {
@@ -74,7 +81,7 @@
 
                     $err = checkMedecin($_POST);
                     if($err != "") {
-                        echo $err;
+                        showMessage("messageError", $err);
                         $champs = array_slice($_POST, 0, count($_POST)-1);
                     } else {
                         if(isset($_GET['idModif'])) {
@@ -88,9 +95,10 @@
 
                 } else if(isset($_POST["validerConsultation"])) {
 
+
                     $err = checkConsultation($_POST, $champs);
                     if($err != "") {
-                        echo $err;
+                        showMessage("messageError", $err);
                         $champs = array_slice($_POST, 0, count($_POST)-1);
                     } else {
                         if(isset($_GET['idModif'])) {
@@ -201,13 +209,13 @@
                             </div>
                         </div>
                         
-                    </div> 
+                    </div> a
                 </div>
                     
                 <div class = "formButtons">
                     <input type = "reset"   name = "reset"          class="btna red">
                     <input type = "submit"  name = "validerPatient" class="btna green">
-                </div>    
+                </div>
             </form>
 
             <!-- Formulaire principal d'ajout d'un Medecin -->
@@ -249,7 +257,7 @@
                             <div class = "formLabel">
                                 <label for = "patientC">Patient:</label>
                             </div>
-                            <select name = "patientC" id = "patientC">
+                            <select onchange="setMedecinTraitantFromPatient(this)" name = "patientC" id = "patientC">
                                 <option value = "-1">Aucun</option>
                                 <?php
                                     $resMedecinString = $linkpdo->prepare("SELECT nom, prenom, civilite, idPatient, idMedecin FROM patient ORDER BY nom");
@@ -322,6 +330,25 @@
         </main>
 
         <?php include "footer.php";?>
-        <script src = "js/tabsystem.js"></script>
+
+    <script src="js/tabsystem.js"></script>
+
+
+        <script type="text/javascript">
+    function setMedecinTraitantFromPatient(select) {
+        let medecinLie = select.options[select.selectedIndex];
+        console.log(medecinLie);
+        let id = medecinLie.getAttribute('data-idmedecin');
+        console.log(id);
+        // Vérifie si patientLie est null ou une chaîne vide
+        if (!id) {
+            id = "-1";
+        }
+
+        console.log(id);
+        document.getElementById("medecinC").value = id;
+    }
+</script>
+
     </body>
 </html>
