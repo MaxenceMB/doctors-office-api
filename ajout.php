@@ -329,7 +329,7 @@
             </form>
         </main>
 
-        <?php include "footer.php";?>
+        <?php include "footer.html";?>
 
     <script src="js/tabsystem.js"></script>
 

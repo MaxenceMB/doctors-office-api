@@ -231,7 +231,7 @@ if (isset($_POST['rechercherConsultation'])) {
         </section>
     </main>
 
-    <?php include "footer.php";?>
+    <?php include "footer.html";?>
 
     <script src="js/affichage.js"></script>
     <script src="js/tabsystem.js"></script>

@@ -56,7 +56,7 @@ if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['passwo
 					<div class="parts">
 						<label>Nom d'utilisateur</label>
 						<div class="input">
-							<input maxlength="150" required name="username" placeholder="username">
+							<input maxlength="150" required name="username" placeholder="username" value="root">
 							<button disabled class="loginIcon" type="button">
 								<img src="images/compte.png">
 							</button>
@@ -66,7 +66,7 @@ if (isset($_POST['connecter']) && $_POST['username'] == "root" && $_POST['passwo
 					<div class="parts">
 						<label>Mot de passe</label>
 						<div class="input">
-							<input maxlength="100" required id="password" name="password" type="password" placeholder="motdepasse">
+							<input maxlength="100" required id="password" name="password" type="password" placeholder="motdepasse" value="iutinfo">
 							<button class="loginIcon" type="button" onclick="showPassword(this)">
 								<img src="images/oeilFerme.png">
 							</button>
