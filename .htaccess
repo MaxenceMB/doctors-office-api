@@ -1,0 +1,25 @@
+Options +FollowSymlinks
+RewriteEngine on
+
+#--------------------------------------------------
+# Règles de réécriture d'URL
+#--------------------------------------------------
+
+# Authentification :
+RewriteRule ^auth$ /doctors-office-api/api/auth/index.php [L]
+
+# Medecins
+RewriteRule ^medecins$ /doctors-office-api/api/cabinet/medecins/index.php [L]
+RewriteRule ^medecins/([0-9]+)$ /doctors-office-api/api/cabinet/medecins/index.php?id=$1 [L]
+
+# Patients
+RewriteRule ^usagers$ /doctors-office-api/api/cabinet/patients/index.php [L]
+RewriteRule ^usagers/([0-9]+)$ /doctors-office-api/api/cabinet/patients/index.php?id=$1 [L]
+
+# Consultations
+RewriteRule ^consultations$ /doctors-office-api/api/cabinet/consultations/index.php [L]
+RewriteRule ^consultations/([0-9]+)$ /doctors-office-api/api/cabinet/consultations/index.php?id=$1 [L]
+
+# Stats
+RewriteRule ^stats/medecins$ /doctors-office-api/api/cabinet/stats/index.php?stat_name=medecin [L]
+RewriteRule ^stats/usagers$ /doctors-office-api/api/cabinet/stats/index.php?stat_name=patient [L]

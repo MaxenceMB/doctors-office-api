@@ -10,7 +10,8 @@ function isPostValid($data) {
         && !empty($data["ville"])
         && !empty($data["date_nais"])
         && !empty($data["lieu_nais"])
-        && !empty($data["num_secu"]);
+        && !empty($data["num_secu"])
+        && !empty($data["id_medecin"]);
 }
 
 function isPatchValid($id, $data) {
@@ -23,7 +24,8 @@ function isPatchValid($id, $data) {
                        ||  !empty($data["ville"])
                        ||  !empty($data["date_nais"])
                        ||  !empty($data["lieu_nais"])
-                       ||  !empty($data["num_secu"]));
+                       ||  !empty($data["num_secu"])
+                       ||  !empty($data["id_medecin"]));
 }
 
 function isPutValid($id, $data) {
@@ -37,7 +39,8 @@ function isPutValid($id, $data) {
         && !empty($data["ville"])
         && !empty($data["date_nais"])
         && !empty($data["lieu_nais"])
-        && !empty($data["num_secu"]);
+        && !empty($data["num_secu"])
+        && !empty($data["id_medecin"]);
 }
 
 function isDeleteValid($id) {
@@ -108,8 +111,8 @@ class Patient {
     public static function create(PDO $pdo, $data):array {
         if (!isPostValid($data)) return Patient::TEMPLATE_400_BAD_REQUEST;
         
-        $stmt = $pdo->prepare("INSERT INTO usager(civilite, nom, prenom, sexe, adresse, code_postal, ville, date_nais, lieu_nais, num_secu)
-                               VALUES(:civilite, :nom, :prenom, :sexe, :adresse, :code_postal, :ville, :date_nais, :lieu_nais, :num_secu);");
+        $stmt = $pdo->prepare("INSERT INTO usager(civilite, nom, prenom, sexe, adresse, code_postal, ville, date_nais, lieu_nais, num_secu, id_medecin)
+                               VALUES(:civilite, :nom, :prenom, :sexe, :adresse, :code_postal, :ville, :date_nais, :lieu_nais, :num_secu, :id_medecin);");
                                
         if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
     
@@ -122,7 +125,8 @@ class Patient {
                  "ville"       => $data["ville"],
                  "date_nais"   => $data["date_nais"],
                  "lieu_nais"   => $data["lieu_nais"],
-                 "num_secu"    => $data["num_secu"]];
+                 "num_secu"    => $data["num_secu"],
+                 "id_medecin"  => $data["id_medecin"]];
 
         if (!$stmt->execute($args)) return Patient::TEMPLATE_403_ERROR;
 
@@ -139,7 +143,7 @@ class Patient {
         if (!isPatchValid($id, $data)) return Patient::TEMPLATE_400_BAD_REQUEST;
 
         $id = htmlspecialchars($id);
-        $columns = ["civilite", "nom", "prenom", "sexe", "adresse", "code_postal", "ville", "date_nais", "lieu_nais", "num_secu"];
+        $columns = ["civilite", "nom", "prenom", "sexe", "adresse", "code_postal", "ville", "date_nais", "lieu_nais", "num_secu", "id_medecin"];
 
         $requestContent = "UPDATE usager SET ";
         $requestArray = [];
@@ -182,7 +186,8 @@ class Patient {
                                    ville       = :ville,
                                    date_nais   = :date_nais,
                                    lieu_nais   = :lieu_nais,
-                                   num_secu    = :num_secu
+                                   num_secu    = :num_secu,
+                                   id_medecin  = :id_medecin
                                WHERE id_usager = :id_usager");
 
         if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
@@ -197,6 +202,7 @@ class Patient {
                  "date_nais"   => $data["date_nais"],
                  "lieu_nais"   => $data["lieu_nais"],
                  "num_secu"    => $data["num_secu"],
+                 "id_medecin"  => $data["id_medecin"],
                  "id_usager"   => $id];
 
         if (!$stmt->execute($args)) return Patient::TEMPLATE_403_ERROR;

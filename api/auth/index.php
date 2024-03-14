@@ -71,7 +71,7 @@ function isUserCorrect($data) {
             $userLogin = $user['login'];
 
             $header  = array("alg" => "HS256", "typ" => "JWT");
-            $payload = array("user_login" => $userLogin, "exp" => (time()+60));
+            $payload = array("user_login" => $userLogin, "exp" => (time()+86400));
 
             $token = generate_jwt($header, $payload, $secret);
 
