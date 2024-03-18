@@ -50,7 +50,7 @@ function isDeleteValid($id) {
 
 class Patient {
 
-    // template de retour JSON pour les erreurs de PREPARE/EXECUTE qui sont forcément entièrement notre faute
+    // Templates de retour JSON pour les erreurs de PREPARE/EXECUTE qui sont forcément entièrement notre faute
     public const TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR = [
         "status_code"    => 500,
         "status_message" => "Internal Server Error : Un problème interne s'est produit.",
@@ -75,12 +75,16 @@ class Patient {
         "data"           => null
     ];
 
-    public static function getAll(PDO $pdo) {
+    public static function getAll(PDO $pdo) : array {
+        
+        // Requête
         $stmt = $pdo->prepare("SELECT * FROM usager");
 
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
-        if (!$stmt->execute()) return Patient::TEMPLATE_403_ERROR;
+        // Gestion des erreurs
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
+        if (!$stmt->execute()) return Patient::TEMPLATE_403_ERROR;              // Erreur du execute()
     
+        // Setup le résultat de la requête et l'envoie
         $matchingData = [
             "status_code"    => 200,
             "status_message" => "Tous les patients ont été reçus.",
@@ -90,32 +94,42 @@ class Patient {
         return $matchingData;
     }
 
-    public static function getById(PDO $pdo, $id):array {
+    public static function getById(PDO $pdo, $id) : array {
+        
+        // Requête
         $stmt = $pdo->prepare("SELECT * FROM usager WHERE id_usager = :id_usager");
 
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
-        if (!$stmt->execute(['id_usager' => $id])) return Patient::TEMPLATE_403_ERROR;
+        // Gestion des erreurs
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
+        if (!$stmt->execute(['id_usager' => $id])) return Patient::TEMPLATE_403_ERROR;  // Erreur du execute()
 
+        // Prend le resultat de la reqête
         $usager = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Si aucun médecin n'a été trouvé (réponse à la requête vide)
         if (!$usager) return Patient::TEMPLATE_404_NOT_FOUND;
         
-        return [
+        // Setup le résultat de la requête et l'envoie
+        $matchingData = [
             "status_code"    => 200,
             "status_message" => "Le patient a été reçu.",
             "data"           => $usager
         ];
+
+        return $matchingData;
     }
 
 
-    public static function create(PDO $pdo, $data):array {
+    public static function create(PDO $pdo, $data) : array {
+
+        // Vérifie que tous les champs ont bien été saisis
         if (!isPostValid($data)) return Patient::TEMPLATE_400_BAD_REQUEST;
         
+        // Requête
         $stmt = $pdo->prepare("INSERT INTO usager(civilite, nom, prenom, sexe, adresse, code_postal, ville, date_nais, lieu_nais, num_secu, id_medecin)
                                VALUES(:civilite, :nom, :prenom, :sexe, :adresse, :code_postal, :ville, :date_nais, :lieu_nais, :num_secu, :id_medecin);");
-                               
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
-    
+                            
+        // Arguments de la requête
         $args = ["civilite"    => $data["civilite"],
                  "nom"         => $data['nom'],
                  "prenom"      => $data["prenom"],
@@ -128,26 +142,42 @@ class Patient {
                  "num_secu"    => $data["num_secu"],
                  "id_medecin"  => $data["id_medecin"]];
 
-        if (!$stmt->execute($args)) return Patient::TEMPLATE_403_ERROR;
 
+        // Début de la transaction
+        $pdo->beginTransaction();
+
+        // Gestion des erreurs
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
+        if (!$stmt->execute($args)) return Patient::TEMPLATE_403_ERROR;         // Erreur du execute()
+
+        // Fin de la transaction
+        $newId = $pdo->lastInsertId();  // Récupération du l'ID du médecin inséré
+        $pdo->commit();                 // Commit l'insertion dans la BD
+        
+        // Setup le résultat de la requête et l'envoie
         $matchingData = [
-            "status_code"    => 200,
+            "status_code"    => 201,
             "status_message" => "Le patient a bien été ajouté.",
-            "data"           => Patient::getById($pdo, $pdo->lastInsertId())["data"]
+            "data"           => Patient::getById($pdo, $newId)["data"]
         ];
     
         return $matchingData;
     }
 
-    public static function partialEdit(PDO $pdo, $id, $data) {
-        if (!isPatchValid($id, $data)) return Patient::TEMPLATE_400_BAD_REQUEST;
+    public static function partialEdit(PDO $pdo, $id, $data) : array {
 
+        // Vérifie que l'id et qu'au moins un champ ont été saisis
+        if (!isPatchValid($id, $data)) return Patient::TEMPLATE_400_BAD_REQUEST;
         $id = htmlspecialchars($id);
+
+        // Tableau avec les noms des arguments possibles
         $columns = ["civilite", "nom", "prenom", "sexe", "adresse", "code_postal", "ville", "date_nais", "lieu_nais", "num_secu", "id_medecin"];
 
+        // Requête
         $requestContent = "UPDATE usager SET ";
         $requestArray = [];
 
+        // Pour chaque valeur dans $data correspondante au tableau des arguments possibles
         foreach ($columns as $key) {
             if (!empty($data[$key])) {
                 $requestContent .= ($requestArray ? ", " : "") . "$key = :$key";
@@ -155,27 +185,41 @@ class Patient {
             }
         }
         
+        // Ajoute le WHERE à la fin
         $requestContent .= " WHERE id_usager = :id_usager";
         $requestArray["id_usager"] = $id;
 
+        // Prépare la requête
         $stmt = $pdo->prepare($requestContent);
 
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
-        if (!$stmt->execute($requestArray)) return Patient::TEMPLATE_403_ERROR;
-        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;
+        // Début de la transaction
+        $pdo->beginTransaction();
 
-        return [
+        // Gestion des erreurs
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;        // Erreur du prepare()
+        if (!$stmt->execute($requestArray)) return Patient::TEMPLATE_403_ERROR;     // Erreur du execute()
+        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;         // Aucune ligne modifiée
+
+        // Fin de la transaction
+        $pdo->commit();
+
+        // Setup le résultat de la requête et l'envoie
+        $matchingData =  [
             "status_code"    => 200,
             "status_message" => "Le patient a bien été modifié partiellement.",
             "data"           => Patient::getById($pdo, $id)["data"]
         ];
+
+        return $matchingData;
     }
 
-    public static function completeEdit(PDO $pdo, $id, $data) {
-        // faire cas si inexistant (edit sur un truc pas existant, le crée (pas PATCH))
+    public static function completeEdit(PDO $pdo, $id, $data) : array {
+        
+        // Vérifie que tous les champs ont été renseignés (id + champs de la table)
         if (!isPutValid($id, $data)) return Patient::TEMPLATE_400_BAD_REQUEST;
-
         $id = htmlspecialchars($id);
+
+        // Requête
         $stmt = $pdo->prepare("UPDATE usager 
                                SET civilite    = :civilite,
                                    nom         = :nom,
@@ -190,8 +234,7 @@ class Patient {
                                    id_medecin  = :id_medecin
                                WHERE id_usager = :id_usager");
 
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
-    
+        // Arguments
         $args = ["civilite"    => $data["civilite"],
                  "nom"         => $data['nom'],
                  "prenom"      => $data["prenom"],
@@ -205,36 +248,54 @@ class Patient {
                  "id_medecin"  => $data["id_medecin"],
                  "id_usager"   => $id];
 
-        if (!$stmt->execute($args)) return Patient::TEMPLATE_403_ERROR;
-        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;
+        // Début de la transaction
+        $pdo->beginTransaction();
 
-        return [
+        // Gestion des erreurs
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
+        if (!$stmt->execute($args)) return Patient::TEMPLATE_403_ERROR;         // Erreur du execute()
+        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;     // Aucune ligne modifiée
+        
+        // Fin de la transaction
+        $pdo->commit();
+
+        // Setup le résultat de la requête et l'envoie
+        $matchingData =  [
             "status_code"    => 200,
             "status_message" => "Le patient a bien été modifié entièrement.",
             "data"           => Patient::getById($pdo, $id)["data"]
         ];
+
+        return $matchingData;
     }
 
-    public static function delete($pdo, $id) {
+    public static function delete($pdo, $id) : array {
+
+        // Vérifie que l'id a bien été saisi
         if (!isDeleteValid($id)) return Patient::TEMPLATE_400_BAD_REQUEST;
         $id = htmlspecialchars($id);
 
+        // Requête
         $stmt = $pdo->prepare("DELETE FROM usager WHERE id_usager = :id_usager");
         
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;
-        if (!$stmt->execute(['id_usager' => $id])) return Patient::TEMPLATE_403_ERROR;
-        if ($stmt->rowCount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;
+        // Début de la transaction
+        $pdo->beginTransaction();
+        
+        // Gestion des erreurs
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
+        if (!$stmt->execute(['id_usager' => $id])) return Patient::TEMPLATE_403_ERROR;  // Erreur du execute()
+        if ($stmt->rowCount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;             // Aucune ligne supprimée
 
-        return [
+        // Fin de la transaction
+        $pdo->commit();
+
+        // Setup le résultat de la requête et l'envoie
+        $matchingData = [
             "status_code"    => 200,
             "status_message" => "Le patient a bien été supprimé.",
             "data"           => null
         ];
+
+        return $matchingData;
     }
 }
-
-
-
-
-
-
