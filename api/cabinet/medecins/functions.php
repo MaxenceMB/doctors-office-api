@@ -94,6 +94,10 @@ class Medecin {
         // Vérifie que tous les champs ont bien été saisis
         if (!isPostValid($data)) return Medecin::TEMPLATE_400_BAD_REQUEST;
         
+        // Vérifie si aucun médecin avec ce nom et prénom existe déjà
+        $existe = Medecin::medecinAlreadyExists($pdo, $data); 
+        if($existe["status_code"] == 403) return $existe;
+        
         // Requête
         $stmt = $pdo->prepare("INSERT INTO medecin(nom, prenom, civilite)
                                VALUES(:nom, :prenom, :civilite)");
@@ -239,6 +243,42 @@ class Medecin {
             "status_message" => "Le médecin a bien été supprimé.",
             "data"           => null
         ];
+
+        return $matchingData;
+    }
+
+
+    public static function medecinAlreadyExists(PDO $pdo, $data) : array {
+
+        // Requête qui vérifie si le médecin existe déjà
+        $stmt = $pdo->prepare("SELECT * 
+                               FROM medecin 
+                               WHERE nom = :nom
+                               AND prenom = :prenom");
+
+        // Arguments
+        $args = ["nom"    => $data['nom'],
+                 "prenom" => $data["prenom"]];
+
+        // Gestion des erreurs
+        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;   // Erreur du prepare()
+        if (!$stmt->execute($args)) return Medecin::TEMPLATE_403_ERROR;        // Erreur du execute()
+
+        // Prend le resultat de la requête, si vide c'est que la voie est libre
+        $medecin = $stmt->fetch(PDO::FETCH_ASSOC);
+        if(!$medecin) {
+            $matchingData =  [
+                "status_code"    => 200,
+                "status_message" => "Le médecin n'existe pas.",
+                "data"           => null
+            ];
+        } else {
+            $matchingData = [
+                "status_code"    => 403,
+                "status_message" => "Un médecin nommé ".$data["prenom"]." ".strtoupper($data["nom"])." existe déjà.",
+                "data"           => $medecin
+            ];
+        }
 
         return $matchingData;
     }

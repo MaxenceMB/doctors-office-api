@@ -124,6 +124,10 @@ class Patient {
 
         // Vérifie que tous les champs ont bien été saisis
         if (!isPostValid($data)) return Patient::TEMPLATE_400_BAD_REQUEST;
+
+        // Vérifie si aucun patient avec ce numéro de sécu existe déjà
+        $existe = Patient::patientAlreadyExists($pdo, $data); 
+        if($existe["status_code"] == 403) return $existe;
         
         // Requête
         $stmt = $pdo->prepare("INSERT INTO usager(civilite, nom, prenom, sexe, adresse, code_postal, ville, date_nais, lieu_nais, num_secu, id_medecin)
@@ -295,6 +299,40 @@ class Patient {
             "status_message" => "Le patient a bien été supprimé.",
             "data"           => null
         ];
+
+        return $matchingData;
+    }
+
+
+    public static function patientAlreadyExists(PDO $pdo, $data) : array {
+
+        // Requête qui vérifie si le patient existe déjà
+        $stmt = $pdo->prepare("SELECT * 
+                               FROM usager 
+                               WHERE num_secu = :num_secu");
+
+        // Arguments
+        $args = ["num_secu" => $data['num_secu']];
+
+        // Gestion des erreurs
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;   // Erreur du prepare()
+        if (!$stmt->execute($args)) return Patient::TEMPLATE_403_ERROR;        // Erreur du execute()
+
+        // Prend le resultat de la requête, si vide c'est que la voie est libre
+        $patient = $stmt->fetch(PDO::FETCH_ASSOC);
+        if(!$patient) {
+            $matchingData =  [
+                "status_code"    => 200,
+                "status_message" => "Le patient n'existe pas.",
+                "data"           => null
+            ];
+        } else {
+            $matchingData = [
+                "status_code"    => 403,
+                "status_message" => "Un patient avec ce numéro de sécurité sociale existe déjà.",
+                "data"           => $patient
+            ];
+        }
 
         return $matchingData;
     }
