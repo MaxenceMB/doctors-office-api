@@ -1,22 +1,4 @@
 <?php
-
-function isPostValid($data) {
-    return !empty($data["date_consult"]) && !empty($data["heure_consult"]) && !empty($data["duree_consult"]) && !empty($data["id_medecin"]) && !empty($data["id_usager"]);
-}
-
-function isPatchValid($id, $data) {
-    return !empty($id) && (!empty($data["date_consult"]) || !empty($data["heure_consult"]) || !empty($data["duree_consult"]) || !empty($data["id_medecin"]) || !empty($data["id_usager"]));
-}
-
-function isPutValid($id, $data) {
-    return !empty($id) && !empty($data["date_consult"]) && !empty($data["heure_consult"]) && !empty($data["duree_consult"]) && !empty($data["id_medecin"]) && !empty($data["id_usager"]);
-}
-
-function isDeleteValid($id) {
-    return isset($id);
-}
-
-
 class Consultation {
 
     // Templates de retour JSON pour les erreurs de PREPARE/EXECUTE qui sont forcément entièrement notre faute
@@ -33,8 +15,8 @@ class Consultation {
     ];
 
     public const TEMPLATE_400_BAD_REQUEST = [
-        "status_code" => 400,
-        "status_message" => "Bad request",
+        "status_code"    => 400,
+        "status_message" => "Bad request : Tous les champs n'ont pas été correctement saisis.",
         "data"           => null
     ];
 
@@ -69,7 +51,7 @@ class Consultation {
         $stmt = $pdo->prepare("SELECT * FROM consultation WHERE id_consult = :id_consult");
 
         // Gestion des erreurs
-        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                 // Erreur du prepare()
+        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
         if (!$stmt->execute(['id_consult' => $id])) return Consultation::TEMPLATE_403_ERROR; // Erreur du execute()
 
         // Prend le resultat de la reqête
@@ -93,7 +75,10 @@ class Consultation {
 
         // Vérifie que tous les champs ont été saisis et que le créneau est libre
         $possible = Consultation::isConsultationPossible($pdo, $data);
-        if($possible['status_code'] == 403) return $possible;
+        if($possible['status_code'] != 200) return $possible;
+
+        $ferie = Consultation::isJourFerie($data);
+        if($ferie['status_code'] != 200) return $ferie;
         
         // Requête
         $stmt = $pdo->prepare("INSERT INTO consultation(date_consult, heure_consult, duree_consult, id_medecin, id_usager)
@@ -159,9 +144,9 @@ class Consultation {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;        // Erreur du prepare()
-        if (!$stmt->execute($requestArray)) return Medecin::TEMPLATE_403_ERROR;     // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;         // Aucune ligne modifiée
+        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;        // Erreur du prepare()
+        if (!$stmt->execute($requestArray)) return Consultation::TEMPLATE_403_ERROR;     // Erreur du execute()
+        if ($stmt->rowcount() == 0) return Consultation::TEMPLATE_404_NOT_FOUND;         // Aucune ligne modifiée
 
         // Fin de la transaction
         $pdo->commit();
@@ -255,6 +240,18 @@ class Consultation {
 
         // Vérifie que tous les champs ont bien été saisis
         if (!isPostValid($data)) return Consultation::TEMPLATE_400_BAD_REQUEST;
+        
+        $anneeStr = substr($data["date_consult"], 0, 4);
+        $annee = intval($anneeStr, 10);
+        $anneeMax = intval(date("Y"), 10)+5;
+
+        if($annee > $anneeMax) {
+            return [
+                "status_code"    => 403,
+                "status_message" => "L'année de la consultation est trop élevée.",
+                "data"           => $annee." > ".$anneeMax
+            ];
+        }
 
         // Requête qui vérifie si le créneau est libre
         // Pour ce faire il sélectionne:
@@ -289,7 +286,7 @@ class Consultation {
         // Prend le resultat de la requête, si vide c'est que la voie est libre
         $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
         if(!$consultation) {
-            $matchingData =  [
+            $matchingData = [
                 "status_code"    => 200,
                 "status_message" => "Le créneau est libre.",
                 "data"           => null
@@ -304,4 +301,81 @@ class Consultation {
 
         return $matchingData;
     }
+
+
+    public static function isJourFerie($data) {
+        $anneeStr = substr($data["date_consult"], 0, 4);
+        $annee = intval($anneeStr, 10);
+
+        $ch = curl_init();
+        $url = "https://calendrier.api.gouv.fr/jours-feries/metropole/".$annee.".json";
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
+
+        $response = json_decode(curl_exec($ch), true);
+        $dates = array_keys($response);
+        $ferie = false;
+
+        foreach($dates as $date) {
+            if ($date == $data["date_consult"]) {
+                $ferie = true;
+                break;
+            }
+        }
+
+        if($ferie) {
+            $matchingData = [
+                "status_code"    => 403,
+                "status_message" => "Le jour selectionné est ferié.",
+                "data"           => $response[$data["date_consult"]]
+            ];
+        } else {
+            $matchingData = [
+                "status_code"    => 200,
+                "status_message" => "Le jour selectionné est libre.",
+                "data"           => $data["date_consult"]
+            ];
+        }
+
+        curl_close($ch);
+
+        return $matchingData;
+    }
+}
+
+function isPostValid($data) {
+    $err = ((isset($data["date_consult"])) ? checkDateConsultation($data["date_consult"]) : ["status_code" => 400, "status_message" => "DATE_INV.", "data" => "La date n'a pas été définie."]) ?:
+           ((isset($data["heure_consult"]) && isset($data["duree_consult"])) ? checkHeure($data["heure_consult"], $data["duree_consult"]) : ["status_code" => 400, "status_message" => "HR_INV.", "data" => "L'heure et/ou la durée n'ont pas été définies."]) ?:
+           ((isset($data["id_medecin"])) ? checkId($data["id_medecin"], "medecin")        : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
+           ((isset($data["id_usager"])) ? checkId($data["id_usager"], "usager")           : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
+    
+    return ($err == "") ? true : $err;
+}
+
+function isPatchValid($id, $data) {
+
+    if(empty($data["date_consult"]) && empty($data["heure_consult"]) && empty($data["duree_consult"]) && empty($data["id_medecin"]) && empty($data["id_usager"])) {
+        $err = ["status_code" => 400, "status_message" => "PATCH_INV.", "data" => "Aucun champ n'a été défini."];
+    } else {
+        $err = ((isset($data["date_consult"])) ? checkDateConsultation($data["date_consult"]) : ["status_code" => 400, "status_message" => "DATE_INV.", "data" => "La date n'a pas été définie."]) ?:
+               ((isset($data["heure_consult"]) && isset($data["duree_consult"])) ? checkHeure($data["heure_consult"], $data["duree_consult"]) : ["status_code" => 400, "status_message" => "HR_INV.", "data" => "L'heure et/ou la durée n'ont pas été définies."]) ?:
+               ((isset($data["id_medecin"]))   ? checkId($data["id_medecin"], "medecin")      : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
+               ((isset($data["id_usager"]))    ? checkId($data["id_usager"], "usager")        : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
+               ((empty($id))                   ? ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."] : "");
+    }
+
+    return ($err == "") ? true : $err;
+}
+
+function isPutValid($id, $data) {
+    $post = isPostValid($data);
+    if(is_array($post)) return $post;
+
+    $err = !empty($id) ? "" : ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."];
+    return ($err == "") ? true : $err;
+}
+
+function isDeleteValid($id) {
+    return isset($id) ? true : ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."];
 }

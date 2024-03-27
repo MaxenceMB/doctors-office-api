@@ -1,22 +1,6 @@
 <?php
 
-function isPostValid($data) {
-    return !empty($data["nom"]) && !empty($data["prenom"]) && !empty($data["civilite"]);
-}
-
-function isPatchValid($id, $data) {
-    return !empty($id) && (!empty($data["nom"]) || !empty($data["prenom"]) || !empty($data["civilite"]));
-}
-
-function isPutValid($id, $data) {
-    return !empty($id) && !empty($data["nom"]) && !empty($data["prenom"]) && !empty($data["civilite"]);
-}
-
-function isDeleteValid($id) {
-    return isset($id);
-}
-
-
+include "../formats.php";
 class Medecin {
 
     // Templates de retour JSON pour les erreurs de PREPARE/EXECUTE qui sont forcément entièrement notre faute
@@ -26,14 +10,8 @@ class Medecin {
         "data"           => null
     ];
 
-    public const TEMPLATE_403_ERROR = [
-        "status_code"    => 403,
-        "status_message" => "Forbidden : Problème interne côté client.",
-        "data"           => null
-    ];
-
     public const TEMPLATE_400_BAD_REQUEST = [
-        "status_code" => 400,
+        "status_code"    => 400,
         "status_message" => "Bad request",
         "data"           => null
     ];
@@ -51,7 +29,7 @@ class Medecin {
 
         // Gestion des erreurs
         if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute()) return Medecin::TEMPLATE_403_ERROR;              // Erreur du execute()
+        if (!$stmt->execute()) return Medecin::TEMPLATE_400_BAD_REQUEST;        // Erreur du execute()
     
         // Setup le résultat de la requête et l'envoie
         $matchingData = [
@@ -69,8 +47,8 @@ class Medecin {
         $stmt = $pdo->prepare("SELECT * FROM medecin WHERE id_medecin = :id_medecin");
 
         // Gestion des erreurs
-        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
-        if (!$stmt->execute(['id_medecin' => $id])) return Medecin::TEMPLATE_403_ERROR; // Erreur du execute()
+        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                  // Erreur du prepare()
+        if (!$stmt->execute(['id_medecin' => $id])) return Medecin::TEMPLATE_400_BAD_REQUEST; // Erreur du execute()
 
         // Prend le resultat de la reqête
         $medecin = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -92,10 +70,11 @@ class Medecin {
     public static function create(PDO $pdo, $data) : array {
 
         // Vérifie que tous les champs ont bien été saisis
-        if (!isPostValid($data)) return Medecin::TEMPLATE_400_BAD_REQUEST;
+        $valide = isPostValid($data);
+        if(is_array($valide)) return $valide;
         
         // Vérifie si aucun médecin avec ce nom et prénom existe déjà
-        $existe = Medecin::medecinAlreadyExists($pdo, $data); 
+        $existe = Medecin::alreadyExists($pdo, $data); 
         if($existe["status_code"] == 403) return $existe;
         
         // Requête
@@ -112,7 +91,7 @@ class Medecin {
 
         // Gestion des erreurs
         if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute($args)) return Medecin::TEMPLATE_403_ERROR;         // Erreur du execute()
+        if (!$stmt->execute($args)) return Medecin::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
 
         // Fin de la transaction
         $newId = $pdo->lastInsertId();  // Récupération du l'ID du médecin inséré
@@ -131,7 +110,8 @@ class Medecin {
     public static function partialEdit(PDO $pdo, $id, $data) : array {
 
         // Vérifie que l'id et qu'au moins un champ ont été saisis
-        if (!isPatchValid($id, $data)) return Medecin::TEMPLATE_400_BAD_REQUEST;
+        $valide = isPatchValid($id, $data);
+        if(is_array($valide)) return $valide;
         $id = htmlspecialchars($id);
 
         // Tableau avec les noms des arguments possibles
@@ -160,9 +140,9 @@ class Medecin {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute($requestArray)) return Medecin::TEMPLATE_403_ERROR; // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;     // Aucune ligne modifiée
+        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
+        if (!$stmt->execute($requestArray)) return Medecin::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
+        if ($stmt->rowcount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;             // Aucune ligne modifiée
 
         // Fin de la transaction
         $pdo->commit();
@@ -180,7 +160,8 @@ class Medecin {
     public static function completeEdit(PDO $pdo, $id, $data) {
 
         // Vérifie que tous les champs ont été renseignés (id + champs de la table)
-        if (!isPutValid($id, $data)) return Medecin::TEMPLATE_400_BAD_REQUEST;
+        $valide = isPutValid($id, $data);
+        if(is_array($valide)) return $valide;
         $id = htmlspecialchars($id);
         
         // Requête
@@ -201,7 +182,7 @@ class Medecin {
 
         // Gestion des erreurs
         if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute($args)) return Medecin::TEMPLATE_403_ERROR;         // Erreur du execute()
+        if (!$stmt->execute($args)) return Medecin::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
         if ($stmt->rowcount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;     // Aucune ligne modifiée
 
         // Fin de la transaction
@@ -220,19 +201,20 @@ class Medecin {
     public static function delete($pdo, $id) {
 
         // Vérifie que l'id a bien été saisi
-        if (!isDeleteValid($id)) return Medecin::TEMPLATE_400_BAD_REQUEST;
+        $valide = isDeleteValid($id);
+        if(is_array($valide)) return $valide;
         $id = htmlspecialchars($id);
-
-        // Requête
-        $stmt = $pdo->prepare("DELETE FROM medecin WHERE id_medecin = :id_medecin");
 
         // Début de la transaction
         $pdo->beginTransaction();
-        
+
+        // Requête: suppression du médecin
+        $stmt = $pdo->prepare("DELETE FROM medecin WHERE id_medecin = :id_medecin");
+
         // Gestion des erreurs
-        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
-        if (!$stmt->execute(['id_medecin' => $id])) return Medecin::TEMPLATE_403_ERROR; // Erreur du execute()
-        if ($stmt->rowCount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;             // Aucune ligne supprimée
+        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                    // Erreur du prepare()
+        if (!$stmt->execute(['id_medecin' => $id])) return Medecin::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
+        if ($stmt->rowCount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;                     // Aucune ligne supprimée
 
         // Fin de la transaction
         $pdo->commit();
@@ -248,7 +230,7 @@ class Medecin {
     }
 
 
-    public static function medecinAlreadyExists(PDO $pdo, $data) : array {
+    public static function alreadyExists(PDO $pdo, $data) : array {
 
         // Requête qui vérifie si le médecin existe déjà
         $stmt = $pdo->prepare("SELECT * 
@@ -262,7 +244,7 @@ class Medecin {
 
         // Gestion des erreurs
         if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;   // Erreur du prepare()
-        if (!$stmt->execute($args)) return Medecin::TEMPLATE_403_ERROR;        // Erreur du execute()
+        if (!$stmt->execute($args)) return Medecin::TEMPLATE_400_BAD_REQUEST;  // Erreur du execute()
 
         // Prend le resultat de la requête, si vide c'est que la voie est libre
         $medecin = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -284,3 +266,37 @@ class Medecin {
     }
 }
 
+
+function isPostValid($data) {
+    $err = ((isset($data["civilite"])) ? checkCivilite($data["civilite"])    : ["status_code" => 400, "status_message" => "CIV_INV.", "data" => "La civilité n'a pas été définie."]) ?:
+           ((isset($data["nom"]))      ? checkNom($data["nom"], "nom")       : ["status_code" => 400, "status_message" => "NOM_INV.", "data" => "Le nom n'a pas été défini."]) ?:
+           ((isset($data["prenom"]))   ? checkNom($data["prenom"], "prenom") : ["status_code" => 400, "status_message" => "PRENOM_INV.", "data" => "Le prénom n'a pas été défini."]);
+    
+    return ($err == "") ? true : $err;
+}
+
+function isPatchValid($id, $data) {
+
+    if(empty($data["civilite"]) && empty($data["nom"]) && empty($data["prenom"])) {
+        $err = ["status_code" => 400, "status_message" => "PATCH_INV.", "data" => "Aucun champ n'a été défini."];
+    } else {
+        $err = ((!empty($data["civilite"])) ? checkCivilite($data["civilite"])    : "") ?:
+               ((!empty($data["nom"]))      ? checkNom($data["nom"], "nom")       : "") ?:
+               ((!empty($data["prenom"]))   ? checkNom($data["prenom"], "prenom") : "") ?:
+               ((empty($id))                ? ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."] : "");
+    }
+
+    return ($err == "") ? true : $err;
+}
+
+function isPutValid($id, $data) {
+    $post = isPostValid($data);
+    if(is_array($post)) return $post;
+
+    $err = !empty($id) ? "" : ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."];
+    return ($err == "") ? true : $err;
+}
+
+function isDeleteValid($id) {
+    return isset($id) ? true : ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."];
+}
