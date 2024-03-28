@@ -4,15 +4,15 @@ class Stats {
     public static function getStatsMedecin(PDO $pdo) : array {
 
         // Requête
-        $stmt = $pdo->prepare("SELECT medecin.id_medecin, medecin.civilite, medecin.nom, medecin.prenom , sum(duree) as dureeTotal 
+        $stmt = $pdo->prepare("SELECT medecin.id_medecin, medecin.civilite, medecin.nom, medecin.prenom , sum(duree_consult) as dureeTotal 
         FROM consultation, medecin
         WHERE consultation.id_medecin = medecin.id_medecin 
         GROUP BY medecin.id_medecin 
-        UNION 
+        UNION
         SELECT id_medecin, civilite, nom, prenom, 0 as dureeTotal 
         FROM medecin 
         WHERE id_medecin not in (SELECT id_medecin FROM consultation) 
-        ORDER BY dureeTotal desc");
+        ORDER BY dureeTotal desc, nom");
 
         // Gestion des erreurs
         if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()

@@ -99,13 +99,13 @@ function isTokenCorrect($token) {
         $matchingData = [
             "status_code"    => 200,
             "status_message" => "Token valide.",
-            "data"           => true
+            "data"           => ["valid" => true]
         ];
     } else {
         $matchingData = [
             "status_code"    => 200,
             "status_message" => "Token invalide.",
-            "data"           => false
+            "data"           => ["valid" => false]
         ];
     }
 

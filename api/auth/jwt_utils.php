@@ -16,6 +16,10 @@ function generate_jwt($headers, $payload, $secret) {
 function is_jwt_valid($jwt, $secret) {
 	// split the jwt
 	$tokenParts = explode('.', $jwt);
+	// check length to not have an key access error [0], [1], [2]
+	if (count($tokenParts) != 3) {
+		return FALSE;
+	}
 	//print_r($tokenParts);
 	$header = base64_decode($tokenParts[0]);
 	$payload = base64_decode($tokenParts[1]);
@@ -23,6 +27,7 @@ function is_jwt_valid($jwt, $secret) {
 
 	// check the expiration time - note this will cause an error if there is no 'exp' claim in the jwt
 	$expiration = json_decode($payload)->exp;
+	
 	$is_token_expired = ($expiration - time()) < 0;
 
 	// build a signature based on the header and payload using the secret
@@ -40,6 +45,18 @@ function is_jwt_valid($jwt, $secret) {
 		return TRUE;
 	}
 }
+
+/*
+function get_role($jwt) {
+    // split the jwt
+    $tokenParts = explode('.', $jwt);
+    //print_r($tokenParts);
+    $payload = base64_decode($tokenParts[1]);
+
+    // check the expiration time - note this will cause an error if there is no 'exp' claim in the jwt
+    return json_decode($payload)->user_role ?? null;
+}
+*/
 
 function base64url_encode($data) {
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
