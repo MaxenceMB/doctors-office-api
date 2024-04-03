@@ -1,8 +1,38 @@
 <?php
 include "functions.php";
 include "../connexionBD.php";
+include "../getBearerToken.php";
 $pdo = createConnection();
 $http_method = $_SERVER['REQUEST_METHOD'];
+
+function isConnectionValid() {
+    $token = get_bearer_token();
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'http://localhost/doctors-office-api/auth?token='.$token);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $response = json_decode($response, true);
+
+    if (!$response['data']['valid']) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+if (!isConnectionValid()) {
+    $matchingData = [
+        "status_code"    => 401,
+        "status_message" => "Unauthorized : Le token que vous utilisez est invalide",
+        "data"           => null
+    ];
+    deliver_response($matchingData['status_code'], $matchingData['status_message'], $matchingData['data']);
+    exit(0);
+}
+
+
 
 switch ($http_method) {
     case 'GET':
@@ -11,17 +41,23 @@ switch ($http_method) {
             if ($statname == "patient") {
                 $matchingData = Stats::getStatsPatient($pdo);
             } else if ($statname == "medecin") {
-
+                $matchingData = Stats::getStatsMedecin($pdo);
             } else {
-                deliver_response("404", "Not found", null);
-                break;
+                $matchingData = [
+                    "status_code"    => 404,
+                    "status_message" => "Not found",
+                    "data"           => null
+                ];
             }
-
-            deliver_response($matchingData['status_code'], $matchingData['status_message'], $matchingData['data']);
-            break;
+        } else {
+            $matchingData = [
+                "status_code"    => 404,
+                "status_message" => "Not found",
+                "data"           => null
+            ];
         }
 
-        deliver_response("404", "Not found", null);
+        deliver_response($matchingData['status_code'], $matchingData['status_message'], $matchingData['data']);
         break;
 }
 
