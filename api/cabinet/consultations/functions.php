@@ -1,16 +1,11 @@
 <?php
+include "../formats.php";
 class Consultation {
 
     // Templates de retour JSON pour les erreurs de PREPARE/EXECUTE qui sont forcément entièrement notre faute
     public const TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR = [
         "status_code"    => 500,
         "status_message" => "Internal Server Error : Un problème interne s'est produit.",
-        "data"           => null
-    ];
-
-    public const TEMPLATE_403_ERROR = [
-        "status_code"    => 403,
-        "status_message" => "Forbidden : Problème interne côté client.",
         "data"           => null
     ];
 
@@ -33,7 +28,7 @@ class Consultation {
 
         // Gestion des erreurs
         if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute()) return Consultation::TEMPLATE_403_ERROR;              // Erreur du execute()
+        if (!$stmt->execute()) return Consultation::TEMPLATE_400_BAD_REQUEST;        // Erreur du execute()
     
         // Setup le résultat de la requête et l'envoie
         $matchingData = [
@@ -51,8 +46,8 @@ class Consultation {
         $stmt = $pdo->prepare("SELECT * FROM consultation WHERE id_consult = :id_consult");
 
         // Gestion des erreurs
-        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
-        if (!$stmt->execute(['id_consult' => $id])) return Consultation::TEMPLATE_403_ERROR; // Erreur du execute()
+        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                   // Erreur du prepare()
+        if (!$stmt->execute(['id_consult' => $id])) return Consultation::TEMPLATE_400_BAD_REQUEST;  // Erreur du execute()
 
         // Prend le resultat de la reqête
         $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -83,9 +78,11 @@ class Consultation {
         // Requête
         $stmt = $pdo->prepare("INSERT INTO consultation(date_consult, heure_consult, duree_consult, id_medecin, id_usager)
                                VALUES(:date_consult, :heure_consult, :duree_consult, :id_medecin, :id_usager)");
+
+        $newDate = convertDate($data['date_consult']);
     
         // Arguments de la requête
-        $args = ["date_consult"  => $data['date_consult'],
+        $args = ["date_consult"  => $newDate,
                  "heure_consult" => $data["heure_consult"],
                  "duree_consult" => $data["duree_consult"],
                  "id_medecin"    => $data["id_medecin"],
@@ -96,7 +93,7 @@ class Consultation {
 
         // Gestion des erreurs
         if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;   // Erreur du prepare()
-        if (!$stmt->execute($args)) return Consultation::TEMPLATE_403_ERROR;        // Erreur du execute()
+        if (!$stmt->execute($args)) return Consultation::TEMPLATE_404_NOT_FOUND;    // Erreur du execute()
 
         // Fin de la transaction
         $newId = $pdo->lastInsertId();
@@ -115,7 +112,8 @@ class Consultation {
     public static function partialEdit(PDO $pdo, $id, $data) : array {
 
         // Vérifie que l'id et qu'au moins un champ ont été saisis
-        if (!isPatchValid($id, $data)) return Consultation::TEMPLATE_400_BAD_REQUEST;
+        $valide = isPatchValid($pdo, $id, $data);
+        if(is_array($valide)) return $valide;
         $id = htmlspecialchars($id);
 
         // Tableau avec les noms des arguments possibles
@@ -144,9 +142,9 @@ class Consultation {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;        // Erreur du prepare()
-        if (!$stmt->execute($requestArray)) return Consultation::TEMPLATE_403_ERROR;     // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Consultation::TEMPLATE_404_NOT_FOUND;         // Aucune ligne modifiée
+        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;           // Erreur du prepare()
+        if (!$stmt->execute($requestArray)) return Consultation::TEMPLATE_400_BAD_REQUEST;  // Erreur du execute()
+        if ($stmt->rowcount() == 0) return Consultation::TEMPLATE_404_NOT_FOUND;            // Aucune ligne modifiée
 
         // Fin de la transaction
         $pdo->commit();
@@ -164,7 +162,8 @@ class Consultation {
     public static function completeEdit(PDO $pdo, $id, $data) : array {
 
         // Vérifie que tous les champs ont été renseignés (id + champs de la table)
-        if (!isPutValid($id, $data)) return Medecin::TEMPLATE_400_BAD_REQUEST;
+        $valide = isPutValid($id, $data);
+        if(is_array($valide)) return $valide;
         $id = htmlspecialchars($id);
         
         // Requête
@@ -189,7 +188,7 @@ class Consultation {
 
         // Gestion des erreurs
         if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;   // Erreur du prepare() 
-        if (!$stmt->execute($args)) return Consultation::TEMPLATE_403_ERROR;        // Erreur du execute()
+        if (!$stmt->execute($args)) return Consultation::TEMPLATE_400_BAD_REQUEST;  // Erreur du execute()
         if ($stmt->rowcount() == 0) return Consultation::TEMPLATE_404_NOT_FOUND;    // Aucune ligne modifiée
 
         // Fin de la transaction
@@ -208,7 +207,8 @@ class Consultation {
     public static function delete($pdo, $id) : array {
 
         // Vérifie que l'id a bien été saisi
-        if (!isDeleteValid($id)) return Consultation::TEMPLATE_400_BAD_REQUEST;
+        $valide = isDeleteValid($id);
+        if(is_array($valide)) return $valide;
         $id = htmlspecialchars($id);
 
         // Requête
@@ -218,9 +218,9 @@ class Consultation {
         $pdo->beginTransaction();
         
         // Gestion des erreurs
-        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;               // Erreur du prepare()
-        if (!$stmt->execute(['id_consult' => $id])) return Consultation::TEMPLATE_403_ERROR;    // Erreur du execute()
-        if ($stmt->rowCount() == 0) return Consultation::TEMPLATE_404_NOT_FOUND;                // Aucune ligne supprimée
+        if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                   // Erreur du prepare()
+        if (!$stmt->execute(['id_consult' => $id])) return Consultation::TEMPLATE_400_BAD_REQUEST;  // Erreur du execute()
+        if ($stmt->rowCount() == 0) return Consultation::TEMPLATE_404_NOT_FOUND;                    // Aucune ligne supprimée
 
         // Fin de la transaction
         $pdo->commit();
@@ -239,7 +239,8 @@ class Consultation {
     public static function isConsultationPossible(PDO $pdo, $data) : array {
 
         // Vérifie que tous les champs ont bien été saisis
-        if (!isPostValid($data)) return Consultation::TEMPLATE_400_BAD_REQUEST;
+        $valide = isPostValid($pdo, $data);
+        if(is_array($valide)) return $valide;
         
         $anneeStr = substr($data["date_consult"], 0, 4);
         $annee = intval($anneeStr, 10);
@@ -281,7 +282,7 @@ class Consultation {
 
         // Gestion des erreurs
         if (!$stmt) return Consultation::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;   // Erreur du prepare()
-        if (!$stmt->execute($args)) return Consultation::TEMPLATE_403_ERROR;        // Erreur du execute()
+        if (!$stmt->execute($args)) return Consultation::TEMPLATE_400_BAD_REQUEST;  // Erreur du execute()
 
         // Prend le resultat de la requête, si vide c'est que la voie est libre
         $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -344,24 +345,24 @@ class Consultation {
     }
 }
 
-function isPostValid($data) {
+function isPostValid($pdo, $data) {
     $err = ((isset($data["date_consult"])) ? checkDateConsultation($data["date_consult"]) : ["status_code" => 400, "status_message" => "DATE_INV.", "data" => "La date n'a pas été définie."]) ?:
            ((isset($data["heure_consult"]) && isset($data["duree_consult"])) ? checkHeure($data["heure_consult"], $data["duree_consult"]) : ["status_code" => 400, "status_message" => "HR_INV.", "data" => "L'heure et/ou la durée n'ont pas été définies."]) ?:
-           ((isset($data["id_medecin"])) ? checkId($data["id_medecin"], "medecin")        : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
-           ((isset($data["id_usager"])) ? checkId($data["id_usager"], "usager")           : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
+           ((isset($data["id_medecin"])) ? checkId($pdo, $data["id_medecin"], "medecin")        : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
+           ((isset($data["id_usager"])) ? checkId($pdo, $data["id_usager"], "usager")           : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
     
     return ($err == "") ? true : $err;
 }
 
-function isPatchValid($id, $data) {
+function isPatchValid($pdo, $id, $data) {
 
     if(empty($data["date_consult"]) && empty($data["heure_consult"]) && empty($data["duree_consult"]) && empty($data["id_medecin"]) && empty($data["id_usager"])) {
         $err = ["status_code" => 400, "status_message" => "PATCH_INV.", "data" => "Aucun champ n'a été défini."];
     } else {
         $err = ((isset($data["date_consult"])) ? checkDateConsultation($data["date_consult"]) : ["status_code" => 400, "status_message" => "DATE_INV.", "data" => "La date n'a pas été définie."]) ?:
                ((isset($data["heure_consult"]) && isset($data["duree_consult"])) ? checkHeure($data["heure_consult"], $data["duree_consult"]) : ["status_code" => 400, "status_message" => "HR_INV.", "data" => "L'heure et/ou la durée n'ont pas été définies."]) ?:
-               ((isset($data["id_medecin"]))   ? checkId($data["id_medecin"], "medecin")      : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
-               ((isset($data["id_usager"]))    ? checkId($data["id_usager"], "usager")        : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
+               ((isset($data["id_medecin"]))   ? checkId($pdo, $data["id_medecin"], "medecin")      : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
+               ((isset($data["id_usager"]))    ? checkId($pdo, $data["id_usager"], "usager")        : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
                ((empty($id))                   ? ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."] : "");
     }
 
@@ -378,4 +379,10 @@ function isPutValid($id, $data) {
 
 function isDeleteValid($id) {
     return isset($id) ? true : ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."];
+}
+
+function convertDate($oldDate) {
+    $values = explode($oldDate, '/');
+    $newDate = $values[2]."-".$values[1]."-".$values[0];
+    return $newDate;
 }

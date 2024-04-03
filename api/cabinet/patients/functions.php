@@ -69,11 +69,12 @@ class Patient {
     public static function create(PDO $pdo, $data) : array {
 
         // Vérifie que tous les champs ont bien été saisis
-        if (!isPostValid($data)) return Patient::TEMPLATE_400_BAD_REQUEST;
+        $valide = isPostValid($pdo, $data);
+        if(is_array($valide)) return $valide;
 
         // Vérifie si aucun patient avec ce numéro de sécu existe déjà
         $existe = Patient::alreadyExists($pdo, $data); 
-        if($existe["status_code"] == 403) return $existe;
+        if($existe["status_code"] != 200) return $existe;
         
         // Requête
         $stmt = $pdo->prepare("INSERT INTO usager(civilite, nom, prenom, sexe, adresse, code_postal, ville, date_nais, lieu_nais, num_secu, id_medecin)
@@ -117,7 +118,7 @@ class Patient {
     public static function partialEdit(PDO $pdo, $id, $data) : array {
 
         // Vérifie que l'id et qu'au moins un champ ont été saisis
-        $valide = isPatchValid($id, $data);
+        $valide = isPatchValid($pdo, $id, $data);
         if(is_array($valide)) return $valide;
         $id = htmlspecialchars($id);
 
@@ -147,9 +148,9 @@ class Patient {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;        // Erreur du prepare()
-        if (!$stmt->execute($requestArray)) return Patient::TEMPLATE_400_BAD_REQUEST;     // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;         // Aucune ligne modifiée
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
+        if (!$stmt->execute($requestArray)) return Patient::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
+        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;             // Aucune ligne modifiée
 
         // Fin de la transaction
         $pdo->commit();
@@ -205,7 +206,7 @@ class Patient {
 
         // Gestion des erreurs
         if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute($args)) return Patient::TEMPLATE_400_BAD_REQUEST;         // Erreur du execute()
+        if (!$stmt->execute($args)) return Patient::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
         if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;     // Aucune ligne modifiée
         
         // Fin de la transaction
@@ -287,7 +288,7 @@ class Patient {
     }
 }
 
-function isPostValid($data) {
+function isPostValid($pdo, $data) {
     $err = ((isset($data["civilite"]))    ? checkCivilite($data["civilite"])        : ["status_code" => 400, "status_message" => "CIV_INV.", "data" => "La civilité n'a pas été définie."]) ?:
            ((isset($data["nom"]))         ? checkNom($data["nom"], "nom")           : ["status_code" => 400, "status_message" => "NOM_INV.", "data" => "Le nom n'a pas été défini."]) ?:
            ((isset($data["prenom"]))      ? checkNom($data["prenom"], "prenom")     : ["status_code" => 400, "status_message" => "PRENOM_INV.", "data" => "La civilité n'a pas été définie."]) ?:
@@ -298,12 +299,12 @@ function isPostValid($data) {
            ((isset($data["date_nais"]))   ? checkDateNaissance($data["date_nais"])  : ["status_code" => 400, "status_message" => "DATN_INV.", "data" => "La date de naissance n'a pas été définie."]) ?:
            ((isset($data["lieu_nais"]))   ? checkVille($data["lieu_nais"], "ville_naissance") : ["status_code" => 400, "status_message" => "LIEU_INV.", "data" => "La ville naissance n'a pas été défini."]) ?:
            ((isset($data["num_secu"]))    ? checkSecurite($data["num_secu"])        : ["status_code" => 400, "status_message" => "SECU_INV.", "data" => "Le numéro de sécurité sociale n'a pas été défini."]) ?:
-           ((isset($data["id_medecin"]))  ? checkId($data["id_medecin"], "medecin") : "");
+           ((isset($data["id_medecin"]))  ? checkId($pdo, $data["id_medecin"], "medecin") : "");
     
     return ($err == "") ? true : $err;
 }
 
-function isPatchValid($id, $data) {
+function isPatchValid($pdo, $id, $data) {
 
     $vide = empty($data["civilite"]) && empty($data["nom"]) && empty($data["prenom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]);
 
@@ -320,7 +321,7 @@ function isPatchValid($id, $data) {
                ((isset($data["date_nais"]))   ? checkDateNaissance($data["date_nais"])  : "") ?:
                ((isset($data["lieu_nais"]))   ? checkVille($data["lieu_nais"], "ville_naissance") : "") ?:
                ((isset($data["num_secu"]))    ? checkSecurite($data["num_secu"])        : "") ?:
-               ((isset($data["id_medecin"]))  ? checkId($data["id_medecin"], "medecin") : "") ?:
+               ((isset($data["id_medecin"]))  ? checkId($pdo, $data["id_medecin"], "medecin") : "") ?:
                ((empty($id))                  ? ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."] : "");
     }
 

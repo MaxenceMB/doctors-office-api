@@ -1,6 +1,4 @@
 <?php
-include "connexionDB.php";
-
 function checkNom($nom, $nomVariable) {
     $nomspe = str_replace("-", "", str_replace(" ", "", $nom));
 
@@ -78,20 +76,11 @@ function checkAdresse($adresse) {
     }      
 
     // Si l'adresse est trop longue
-    if(strlen($adresse) > 20) {
+    if(strlen($adresse) > 50) {
         return [
             "status_code"    => 400,
             "status_message" => "ADR_LONG", 
             "data"           => "L'adresse est trop long."
-        ];
-    }       
-
-    // Si l'adresse contient des caractères spéciaux
-    if(preg_match('/[^a-zA-Zà-üÀ-Ü -]+/', $adresse, $matches)) {
-        return [
-            "status_code"    => 400,
-            "status_message" => "ADR_SPE",
-            "data"           => "L'adresse contient des caractères spéciaux et/ou nombres."
         ];
     }
 
@@ -222,18 +211,11 @@ function checkSecurite($secu) {
     return "";
 }
 
-function checkId($id, $table) {
+function checkId($pdo, $id, $table) {
 
-    $pdo = createConnection();
-
-    $req = $pdo->prepare('SELECT * 
-                            FROM   :nomTable 
-                            WHERE  :idTable = :id;');
-
-    $args = ["nomTable" => $table,
-                "idTable"  => 'id_'.$table,
-                "id"       => $id];
-
+    $requete = "SELECT * FROM ".$table." WHERE id_".$table." = :id";
+    $req = $pdo->prepare($requete);
+    $args = ["id" => $id];
 
     $req->execute($args);
 
