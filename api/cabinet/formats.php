@@ -147,8 +147,11 @@ function checkCodePostal($cp) {
 
 
 function checkDateNaissance($dateN) {
+    $realDate = DateTime::createFromFormat("d/m/Y", $dateN);
+    $today = DateTime::createFromFormat("d/m/Y", date("d/m/Y"));
+    $old = DateTime::createFromFormat("d/m/Y", "01/01/1900");
 
-    // Si la taille est anormale (0000-00-00 = 10 caractères)
+    // Si la taille est anormale (00/00/0000 = 10 caractères)
     if(strlen($dateN) != 10) {
         return [
             "status_code"    => 400,
@@ -167,7 +170,7 @@ function checkDateNaissance($dateN) {
     }
 
     // Si la date est supérieure à aujourd'hui
-    if($dateN > date("d/m/Y")) {
+    if($realDate > $today) {
         return [
             "status_code"    => 400,
             "status_message" => "DATN_SUP",
@@ -176,7 +179,7 @@ function checkDateNaissance($dateN) {
     }  
 
     // Si la date est inferieure au 01/01/1900
-    if($dateN < "01/01/1900") {
+    if($realDate < $old) {
         return [
             "status_code"    => 400,
             "status_message" => "DATN_INF",
@@ -307,4 +310,17 @@ function checkHeure($heure, $duree) {
     }  
 
     return "";
+}
+
+
+function toDatabaseFormat($prettyDate) : String {
+    $values = explode('/', $prettyDate);
+    $newDate = $values[2]."-".$values[1]."-".$values[0];
+    return $newDate;
+}
+
+function toPrettyFormat($uglyDate) : String {
+    $values = explode('-', $uglyDate);
+    $newDate = $values[2]."/".$values[1]."/".$values[0];
+    return $newDate;
 }

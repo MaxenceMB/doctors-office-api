@@ -140,9 +140,9 @@ class Medecin {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
-        if (!$stmt->execute($requestArray)) return Medecin::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;             // Aucune ligne modifiée
+        if (Medecin::getById($pdo, $id)["status_code"] == 404) return Medecin::TEMPLATE_404_NOT_FOUND;  // Aucun médecin n'a cet id
+        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                            // Erreur du prepare()
+        if (!$stmt->execute($requestArray)) return Medecin::TEMPLATE_400_BAD_REQUEST;                   // Erreur du execute()
 
         // Fin de la transaction
         $pdo->commit();
@@ -181,9 +181,9 @@ class Medecin {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute($args)) return Medecin::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Medecin::TEMPLATE_404_NOT_FOUND;     // Aucune ligne modifiée
+        if (Medecin::getById($pdo, $id)["status_code"] == 404) return Medecin::TEMPLATE_404_NOT_FOUND;  // Aucun médecin n'a cet id
+        if (!$stmt) return Medecin::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                            // Erreur du prepare()
+        if (!$stmt->execute($args)) return Medecin::TEMPLATE_400_BAD_REQUEST;                           // Erreur du execute()
 
         // Fin de la transaction
         $pdo->commit();

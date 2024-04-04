@@ -34,8 +34,8 @@ class Patient {
         $matchingData = [
             "status_code"    => 200,
             "status_message" => "Tous les patients ont été reçus.",
-            "data"           => $stmt->fetchAll(PDO::FETCH_ASSOC)
-        ];
+            "data"           => $stmt->fetchAll(PDO::FETCH_ASSOC)               // Il faudrait modifier l'affichage de la date que l'on reçoit mais ça demanderait un traitement
+        ];                                                                      // supplémentaire inutile, car la date au format YYYY-MM-DD est compréhensible
     
         return $matchingData;
     }
@@ -88,7 +88,7 @@ class Patient {
                  "adresse"     => $data["adresse"],
                  "code_postal" => $data["code_postal"],
                  "ville"       => $data["ville"],
-                 "date_nais"   => $data["date_nais"],
+                 "date_nais"   => toDatabaseFormat($data["date_nais"]),
                  "lieu_nais"   => $data["lieu_nais"],
                  "num_secu"    => $data["num_secu"],
                  "id_medecin"  => $data["id_medecin"]];
@@ -133,7 +133,7 @@ class Patient {
         foreach ($columns as $key) {
             if (!empty($data[$key])) {
                 $requestContent .= ($requestArray ? ", " : "") . "$key = :$key";
-                $requestArray[$key] = $data[$key];
+                $requestArray[$key] = ($key == "date_nais") ? $data[$key] : toDatabaseFormat($data['date_nais']);
             }
         }
         
@@ -148,9 +148,9 @@ class Patient {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;            // Erreur du prepare()
-        if (!$stmt->execute($requestArray)) return Patient::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;             // Aucune ligne modifiée
+        if (Patient::getById($pdo, $id)["status_code"] == 404) return Patient::TEMPLATE_404_NOT_FOUND;  // Aucun patient n'a cet id
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                            // Erreur du prepare()
+        if (!$stmt->execute($requestArray)) return Patient::TEMPLATE_400_BAD_REQUEST;                   // Erreur du execute()
 
         // Fin de la transaction
         $pdo->commit();
@@ -195,7 +195,7 @@ class Patient {
                  "adresse"     => $data["adresse"],
                  "code_postal" => $data["code_postal"],
                  "ville"       => $data["ville"],
-                 "date_nais"   => $data["date_nais"],
+                 "date_nais"   => toDatabaseFormat($data["date_nais"]),
                  "lieu_nais"   => $data["lieu_nais"],
                  "num_secu"    => $data["num_secu"],
                  "id_medecin"  => $data["id_medecin"],
@@ -205,9 +205,9 @@ class Patient {
         $pdo->beginTransaction();
 
         // Gestion des erreurs
-        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;    // Erreur du prepare()
-        if (!$stmt->execute($args)) return Patient::TEMPLATE_400_BAD_REQUEST;   // Erreur du execute()
-        if ($stmt->rowcount() == 0) return Patient::TEMPLATE_404_NOT_FOUND;     // Aucune ligne modifiée
+        if (Patient::getById($pdo, $id)["status_code"] == 404) return Patient::TEMPLATE_404_NOT_FOUND;  // Aucun patient n'a cet id
+        if (!$stmt) return Patient::TEMPLATE_MATCHING_DATA_SYSTEM_500_ERROR;                            // Erreur du prepare()
+        if (!$stmt->execute($args)) return Patient::TEMPLATE_400_BAD_REQUEST;                           // Erreur du execute()
         
         // Fin de la transaction
         $pdo->commit();
@@ -306,7 +306,7 @@ function isPostValid($pdo, $data) {
 
 function isPatchValid($pdo, $id, $data) {
 
-    $vide = empty($data["civilite"]) && empty($data["nom"]) && empty($data["prenom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]) && empty($data["nom"]);
+    $vide = empty($data["civilite"]) && empty($data["nom"]) && empty($data["prenom"]) && empty($data["sexe"]) && empty($data["adresse"]) && empty($data["code_postal"]) && empty($data["ville"]) && empty($data["date_nais"]) && empty($data["lieu_nais"]) && empty($data["num_secu"]) && empty($data["id_medecin"]);
 
     if($vide) {
         $err = ["status_code" => 400, "status_message" => "PATCH_INV.", "data" => "Aucun champ n'a été défini."];
