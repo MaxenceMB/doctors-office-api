@@ -151,21 +151,11 @@ function checkDateNaissance($dateN) {
     $today = DateTime::createFromFormat("d/m/Y", date("d/m/Y"));
     $old = DateTime::createFromFormat("d/m/Y", "01/01/1900");
 
-    // Si la taille est anormale (00/00/0000 = 10 caractères)
-    if(strlen($dateN) != 10) {
+    if(!preg_match('/^([012]?[0-9]|3[0-1])\/+([0]?[0-9]|1[0-2])\/+[1-2][0-9][0-9][0-9]$/', $dateN, $matches)) {
         return [
             "status_code"    => 400,
-            "status_message" => "DATN_INV",
-            "data"           => "La date de naissance est invalide."
-        ];
-    }  
-
-    // Si la date contient des caractères spéciaux
-    if(preg_match('/[^0-9\/]+/', $dateN, $matches)) {
-        return [
-            "status_code"    => 400,
-            "status_message" => "DATN_SPE",
-            "data"           => "La date de naissance contient des caractères spéciaux."
+            "status_message" => "DATE_SPE",
+            "data"           => "La date est invalide."
         ];
     }
 
@@ -236,25 +226,18 @@ function checkId($pdo, $id, $table) {
 
 
 function checkDateConsultation($dateC) {
+    $realDate = DateTime::createFromFormat("d/m/Y", $dateC);
+    $today = DateTime::createFromFormat("d/m/Y", date("d/m/Y"));  
 
-    // Si la taille est anormale (00/00/0000 = 10 caractères)
-    if(strlen($dateC) != 10) {
-        return [
-            "status_code"    => 400,
-            "status_message" => "DATE_INV",
-            "data"           => "La date est invalide."
-        ];
-    }  
-
-    if(preg_match('/[^0-9\/]+/', $dateC, $matches)) {
+    if(!preg_match('/^([012]?[0-9]|3[0-1])\/+([0]?[0-9]|1[0-2])\/+[1-2][0-9][0-9][0-9]$/', $dateC, $matches)) {
         return [
             "status_code"    => 400,
             "status_message" => "DATE_SPE",
-            "data"           => "La date contient des caractères spéciaux."
+            "data"           => "La date est invalide."
         ];
     }
 
-    if($dateC < date("d/m/Y")) {
+    if($realDate < $today) {
         return [
             "status_code"    => 400,
             "status_message" => "DATE_ANT",
@@ -277,11 +260,11 @@ function checkHeure($heure, $duree) {
         ];
     }  
 
-    if(preg_match('/[^0-9:]+/', $heure, $matches)) {
+    if(!preg_match('/^([01]?[0-9]|2[0-3])\:+[0-5][0-9]$/', $heure, $matches)) {
         return [
             "status_code"    => 400,
             "status_message" => "HR_SPE",
-            "data"           => "L'heure contient des caractères spéciaux."
+            "data"           => "L'heure est invalide."
         ];
     }
 
@@ -308,7 +291,7 @@ function checkHeure($heure, $duree) {
     if($heureMinutes < 8 * 60) {
         return [
             "status_code"    => 400,
-            "status_message" => "HR_SUP",
+            "status_message" => "HR_INF",
             "data"           => "L'heure est inférieure à 8h."
         ];
     }  

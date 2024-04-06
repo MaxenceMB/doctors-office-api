@@ -316,8 +316,10 @@ class Consultation {
         $dates = array_keys($response);
         $ferie = false;
 
+        $dateConsult = toDatabaseFormat($data["date_consult"]);
+
         foreach($dates as $date) {
-            if ($date == $data["date_consult"]) {
+            if ($date == $dateConsult) {
                 $ferie = true;
                 break;
             }
@@ -327,7 +329,7 @@ class Consultation {
             $matchingData = [
                 "status_code"    => 403,
                 "status_message" => "Le jour selectionné est ferié.",
-                "data"           => $response[$data["date_consult"]]
+                "data"           => $response[$dateConsult]
             ];
         } else {
             $matchingData = [
