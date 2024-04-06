@@ -2,8 +2,12 @@
 
 include "functions.php";                    // Fonctions de l'API patients
 include "../connexionBD.php";               // Connexion à la BD du cabinet
+include "../utils.php";                     // Fonctions utilitaires pour la connection par token
 $pdo = createConnection();                  // Création du lien de connexion à la BD
 $http_method = $_SERVER['REQUEST_METHOD'];  // Récupération de la méthode HTTP
+
+
+verifTokenConnection();
 
 // En fonction de la méthode HTTP
 switch ($http_method) {
@@ -79,17 +83,4 @@ switch ($http_method) {
         // Envoi de la réponse
         deliver_response($matchingData['status_code'], $matchingData['status_message'], $matchingData['data']);
         break;
-}
-
-function deliver_response($status_code, $status_message, $data = null) {
-    http_response_code($status_code);
-    header("Content-Type:application/json; charset=utf-8");
-
-    $response['status_code']    = $status_code;
-    $response['status_message'] = $status_message;
-    $response['data']           = $data;
-
-    $json_response = json_encode($response);
-    if($json_response === false) die('JSON Encode ERROR : '.json_last_error_msg());
-    echo $json_response;
 }

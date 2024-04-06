@@ -1,45 +1,23 @@
 <?php
-include "functions.php";
-include "../connexionBD.php";
-include "../getBearerToken.php";
-$pdo = createConnection();
-$http_method = $_SERVER['REQUEST_METHOD'];
-
-function isConnectionValid() {
-    $token = get_bearer_token();
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'http://localhost/doctors-office-api/auth?token='.$token);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    $response = json_decode($response, true);
-
-    if (!$response['data']['valid']) {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-if (!isConnectionValid()) {
-    $matchingData = [
-        "status_code"    => 401,
-        "status_message" => "Unauthorized : Le token que vous utilisez est invalide",
-        "data"           => null
-    ];
-    deliver_response($matchingData['status_code'], $matchingData['status_message'], $matchingData['data']);
-    exit(0);
-}
+include "functions.php";                    // Fonctions de l'API patients
+include "../connexionBD.php";               // Connexion à la BD du cabinet
+include "../utils.php";                     // Fonctions utilitaires pour la connection par token
+$pdo = createConnection();                  // Création du lien de connexion à la BD
+$http_method = $_SERVER['REQUEST_METHOD'];  // Récupération de la méthode HTTP
 
 
+verifTokenConnection();
 
+// En fonction de la méthode HTTP
 switch ($http_method) {
     case 'GET':
+        // si le paramètre d'entrée dans la requête GET stat_name est bien mis
         if(isset($_GET['stat_name'])) {
             $statname = $_GET['stat_name'];
+            // si la stat cherché est patient, on renvoit la stat des patients
             if ($statname == "patient") {
                 $matchingData = Stats::getStatsPatient($pdo);
+            // sinon si la stat cherché est médecin, on renvoit la stat des médecins
             } else if ($statname == "medecin") {
                 $matchingData = Stats::getStatsMedecin($pdo);
             } else {
@@ -49,6 +27,7 @@ switch ($http_method) {
                     "data"           => null
                 ];
             }
+        // sinon aucun résultat
         } else {
             $matchingData = [
                 "status_code"    => 404,
@@ -59,17 +38,4 @@ switch ($http_method) {
 
         deliver_response($matchingData['status_code'], $matchingData['status_message'], $matchingData['data']);
         break;
-}
-
-function deliver_response($status_code, $status_message, $data = null) {
-    http_response_code($status_code);
-    header("Content-Type:application/json; charset=utf-8");
-
-    $response['status_code']    = $status_code;
-    $response['status_message'] = $status_message;
-    $response['data']           = $data;
-
-    $json_response = json_encode($response);
-    if($json_response === false) die('JSON Encode ERROR : '.json_last_error_msg());
-    echo $json_response;
 }
