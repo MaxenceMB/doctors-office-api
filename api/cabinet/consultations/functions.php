@@ -125,7 +125,7 @@ class Consultation {
         foreach ($columns as $key) {
             if (!empty($data[$key])) {
                 $requestContent .= ($requestArray ? ", " : "") . "$key = :$key";
-                $requestArray[$key] = ($key == "date_consult") ? $data[$key] : toDatabaseFormat($data['date_consult']);
+                $requestArray[$key] = ($key == "date_consult") ? toDatabaseFormat($data['date_consult']) : $data[$key];
             }
         }
         
@@ -341,13 +341,29 @@ class Consultation {
 
         return $matchingData;
     }
+
+    public static function patchConsultationHeure(PDO $pdo, $id, $heure, $duree) {
+
+        // Requête
+        $stmt = $pdo->prepare("SELECT heure_consult, duree_consult FROM consultation WHERE id_consult = :id_consult");
+        $stmt->execute(['id_consult' => $id]);
+        $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Si aucune consultation n'a été trouvée (réponse à la requête vide)
+        if (!$consultation) return Consultation::TEMPLATE_404_NOT_FOUND;
+
+        if($heure == null) $heure = substr($consultation["heure_consult"], 0, 5);
+        if($duree == null) $duree = $consultation["duree_consult"];
+        
+        return checkHeure($heure, $duree);
+    }
 }
 
 function isPostValid($pdo, $data) {
-    $err = ((isset($data["date_consult"])) ? checkDateConsultation($data["date_consult"]) : ["status_code" => 400, "status_message" => "DATE_INV.", "data" => "La date n'a pas été définie."]) ?:
+    $err = ((isset($data["date_consult"])) ? checkDateConsultation($data["date_consult"])  : ["status_code" => 400, "status_message" => "DATE_INV.", "data" => "La date n'a pas été définie."])  ?:
            ((isset($data["heure_consult"]) && isset($data["duree_consult"])) ? checkHeure($data["heure_consult"], $data["duree_consult"]) : ["status_code" => 400, "status_message" => "HR_INV.", "data" => "L'heure et/ou la durée n'ont pas été définies."]) ?:
-           ((isset($data["id_medecin"])) ? checkId($pdo, $data["id_medecin"], "medecin")  : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
-           ((isset($data["id_usager"])) ? checkId($pdo, $data["id_usager"], "usager")     : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
+           ((isset($data["id_medecin"]))   ? checkId($pdo, $data["id_medecin"], "medecin") : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
+           ((isset($data["id_usager"]))    ? checkId($pdo, $data["id_usager"], "usager")   : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
     
     return ($err == "") ? true : $err;
 }
@@ -357,11 +373,14 @@ function isPatchValid($pdo, $id, $data) {
     if(empty($data["date_consult"]) && empty($data["heure_consult"]) && empty($data["duree_consult"]) && empty($data["id_medecin"]) && empty($data["id_usager"])) {
         $err = ["status_code" => 400, "status_message" => "PATCH_INV.", "data" => "Aucun champ n'a été défini."];
     } else {
-        $err = ((isset($data["date_consult"])) ? checkDateConsultation($data["date_consult"])  : ["status_code" => 400, "status_message" => "DATE_INV.", "data" => "La date n'a pas été définie."]) ?:
-               ((isset($data["heure_consult"]) && isset($data["duree_consult"])) ? checkHeure($data["heure_consult"], $data["duree_consult"]) : ["status_code" => 400, "status_message" => "HR_INV.", "data" => "L'heure et/ou la durée n'ont pas été définies."]) ?:
-               ((isset($data["id_medecin"]))   ? checkId($pdo, $data["id_medecin"], "medecin") : ["status_code" => 400, "status_message" => "MED_INV.", "data" => "Le médecin n'a pas été défini."]) ?:
-               ((isset($data["id_usager"]))    ? checkId($pdo, $data["id_usager"], "usager")   : ["status_code" => 400, "status_message" => "USA_INV.", "data" => "L'usager n'a pas été défini."]);
-               ((empty($id))                   ? ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."] : "");
+        $heure = (!isset($data["heure_consult"])) ? null : $data["heure_consult"];
+        $duree = (!isset($data["duree_consult"])) ? null : $data["duree_consult"];
+
+        $err = (isset($data["date_consult"]) ? checkDateConsultation($data["date_consult"])  : "") ?:
+               (($heure != null || $duree != null) ? Consultation::patchConsultationHeure($pdo, $id, $heure, $duree) : "") ?:
+               (isset($data["id_medecin"])   ? checkId($pdo, $data["id_medecin"], "medecin") : "") ?:
+               (isset($data["id_usager"])    ? checkId($pdo, $data["id_usager"], "usager")   : "") ?:
+               (empty($id)                   ? ["status_code" => 400, "status_message" => "ID_INV.", "data" => "L'id n'a pas été défini'."] : "");
     }
 
     return ($err == "") ? true : $err;

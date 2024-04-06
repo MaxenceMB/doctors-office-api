@@ -285,18 +285,22 @@ function checkHeure($heure, $duree) {
         ];
     }
 
-    ////////////////////////////////////////////////////
-    // VERIFIER AUSSI SI LES MINUTES DEPASSENT PAS 60 //
-    ////////////////////////////////////////////////////
+    if(preg_match('/[^0-9]+/', $duree, $matches)) {
+        return [
+            "status_code"    => 400,
+            "status_message" => "DR_SPE",
+            "data"           => "La durée contient des caractères spéciaux."
+        ];
+    }
 
     $heureMinutes = intval(substr($heure, 0, 2)) * 60 + intval(substr($heure, 3, 2));
-    $heureFin = $heureMinutes + intval(substr($duree, 0, 2)) * 60 + intval(substr($duree, 3, 2));
+    $heureFin = $heureMinutes + intval($duree);
 
     if($heureFin > 20 * 60) {
         return [
             "status_code"    => 400,
             "status_message" => "HR_SUP",
-            "data"           => "L'heure est supérieure à 20h."
+            "data"           => "Le rendez-vous dépasse 20h."
         ];
     }  
 

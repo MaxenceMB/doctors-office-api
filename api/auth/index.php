@@ -14,9 +14,9 @@ switch ($http_method) {
             $matchingData = isTokenCorrect($token);
         } else {
             $matchingData = [
-                "status_code"    => 500,
-                "status_message" => "Le token n'a pas été renseigné.",
-                "data"           => ":("
+                "status_code"    => 400,
+                "status_message" => "Bad request",
+                "data"           => "Le token n'a pas été renseigné."
             ];
         }
         deliver_response($matchingData['status_code'], $matchingData['status_message'], $matchingData['data']);
@@ -51,9 +51,9 @@ function isUserCorrect($data) {
     // Vérifie si un couple login/password a bien été donné
     if(empty($data['login']) || empty($data['mdp'])) {
         $matchingData = [
-            "status_code"    => 500,
-            "status_message" => "Login ou mot de passe non renseigné.",
-            "data"           => $data
+            "status_code"    => 400,
+            "status_message" => "Bad request",
+            "data"           => "Login ou mot de passe non renseigné."
         ];
     } else {
         $login = $data['login'];
@@ -77,14 +77,14 @@ function isUserCorrect($data) {
 
             $matchingData = [
                 "status_code"    => 200,
-                "status_message" => "Connexion réussie",
+                "status_message" => "OK",
                 "data"           => $token
             ];
         } else {
             $matchingData = [
                 "status_code"    => 404,
-                "status_message" => "Aucun utilisateur ne correspond à ce couple login / mot de passe.",
-                "data"           => ":("
+                "status_message" => "Not found",
+                "data"           => "Aucun utilisateur ne correspond à ce couple login / mot de passe."
             ];
         }
     }
@@ -98,14 +98,16 @@ function isTokenCorrect($token) {
     if(is_jwt_valid($token, $secret)) {
         $matchingData = [
             "status_code"    => 200,
-            "status_message" => "Token valide.",
-            "data"           => ["valid" => true]
+            "status_message" => "OK",
+            "data"           => ["message" => "Token valide.",
+                                 "valid" => true]
         ];
     } else {
         $matchingData = [
             "status_code"    => 200,
-            "status_message" => "Token invalide.",
-            "data"           => ["valid" => false]
+            "status_message" => "OK",
+            "data"           => ["message" => "Token invalide.",
+                                 "valid" => true]
         ];
     }
 
