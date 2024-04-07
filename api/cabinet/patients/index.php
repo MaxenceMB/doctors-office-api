@@ -6,7 +6,6 @@ include "../utils.php";                     // Fonctions utilitaires pour la con
 $pdo = createConnection();                  // Création du lien de connexion à la BD
 $http_method = $_SERVER['REQUEST_METHOD'];  // Récupération de la méthode HTTP
 
-
 verifTokenConnection();
 
 // En fonction de la méthode HTTP

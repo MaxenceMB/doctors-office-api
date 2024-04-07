@@ -133,7 +133,7 @@ class Patient {
         foreach ($columns as $key) {
             if (!empty($data[$key])) {
                 $requestContent .= ($requestArray ? ", " : "") . "$key = :$key";
-                $requestArray[$key] = ($key == "date_nais") ? $data[$key] : toDatabaseFormat($data['date_nais']);
+                $requestArray[$key] = ($key == "date_nais") ? toDatabaseFormat($data['date_nais']) : $data[$key];
             }
         }
         

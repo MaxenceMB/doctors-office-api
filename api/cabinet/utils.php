@@ -39,7 +39,7 @@ function isConnectionValid() {
     $token = get_bearer_token();
 
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'http://localhost/doctors-office-api/auth?token='.$token);
+    curl_setopt($ch, CURLOPT_URL, 'https://xouxou.alwaysdata.net/doctors-office-api/auth/'.$token);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
     curl_close($ch);

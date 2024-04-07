@@ -107,7 +107,7 @@ function isTokenCorrect($token) {
             "status_code"    => 200,
             "status_message" => "OK",
             "data"           => ["message" => "Token invalide.",
-                                 "valid" => true]
+                                 "valid" => false]
         ];
     }
 
