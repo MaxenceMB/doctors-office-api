@@ -79,6 +79,8 @@ class Patient {
         // Requête
         $stmt = $pdo->prepare("INSERT INTO usager(civilite, nom, prenom, sexe, adresse, code_postal, ville, date_nais, lieu_nais, num_secu, id_medecin)
                                VALUES(:civilite, :nom, :prenom, :sexe, :adresse, :code_postal, :ville, :date_nais, :lieu_nais, :num_secu, :id_medecin);");
+
+        $med = !isset($data["id_medecin"]) ? null : $data["id_medecin"];
                             
         // Arguments de la requête
         $args = ["civilite"    => $data["civilite"],
@@ -91,7 +93,7 @@ class Patient {
                  "date_nais"   => toDatabaseFormat($data["date_nais"]),
                  "lieu_nais"   => $data["lieu_nais"],
                  "num_secu"    => $data["num_secu"],
-                 "id_medecin"  => $data["id_medecin"]];
+                 "id_medecin"  => $med];
 
 
         // Début de la transaction
@@ -187,6 +189,8 @@ class Patient {
                                    id_medecin  = :id_medecin
                                WHERE id_usager = :id_usager");
 
+        $med = !isset($data["id_medecin"]) ? null : $data["id_medecin"];
+
         // Arguments
         $args = ["civilite"    => $data["civilite"],
                  "nom"         => $data['nom'],
@@ -198,7 +202,7 @@ class Patient {
                  "date_nais"   => toDatabaseFormat($data["date_nais"]),
                  "lieu_nais"   => $data["lieu_nais"],
                  "num_secu"    => $data["num_secu"],
-                 "id_medecin"  => $data["id_medecin"],
+                 "id_medecin"  => $med,
                  "id_usager"   => $id];
 
         // Début de la transaction
